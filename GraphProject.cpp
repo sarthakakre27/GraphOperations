@@ -185,7 +185,83 @@ bool Data::addEdgeByIndex(int Giveindex, Graph& g)
     
 }
 
+bool Data::deleteEdgeByKey(int Givekey)
+{
+    list<ListData>::iterator it;
+    for(it = this->adjList.begin(); it != this->adjList.end(); it++)//search for the key
+    {
+        if(it->key == Givekey)//key found
+        {
+            break;
+        }
+    }
+    if(it != this->adjList.end())//erase if valid listnode found
+    {
+        this->adjList.erase(it);
+        return true;
+    }
+    return false;
+}
 
+bool Data::deleteEdgeByIndex(int Giveindex)
+{
+    list<ListData>::iterator it;
+    for(it = this->adjList.begin(); it != this->adjList.end(); it++)//search for the index
+    {
+        if(it->index == Giveindex)//index found
+        {
+            break;
+        }
+    }
+    if(it != this->adjList.end())//erase if valid listnode found
+    {
+        this->adjList.erase(it);
+        return true;
+    }
+    return false;
+}
+
+void Graph::breadthFirstTraversal(int index)
+{
+    if(index < 0 || index > sizeof(Nodes))
+    {
+        cout<<"invalid index"<<endl;
+        return;//invalid index
+    }
+
+    bool* visited = new bool[this->Nodes.size()];
+    memset(visited,false,sizeof(visited));
+
+    list<int> queue;
+    visited[index] = true;
+
+    queue.push_back(index);
+
+    list<ListData>::iterator it;
+    while(!queue.empty())
+    {
+        index = queue.front();
+        //later appropriate data should be printed
+        cout<<index<<" ";
+        queue.pop_front();
+
+        for(it = Nodes[index].adjList.begin(); it != Nodes[index].adjList.end(); it++)
+        {
+            if(!visited[it->index])
+            {
+                visited[it->index] = true;
+                queue.push_back(it->index);
+            }
+        }
+
+    }
+}
+
+void Graph::dfsTraversal(int index)
+{
+    static int* dfsvisited = new int[sizeof(Nodes)];
+    
+}
 
 int main()
 {

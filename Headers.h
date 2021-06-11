@@ -21,7 +21,8 @@ public:
     ~Data();
     bool addEdgeByKey(int key, Graph &g);
     bool addEdgeByIndex(int index, Graph& g);
-    bool deleteEdgeByKey();
+    bool deleteEdgeByKey(int Givekey);
+    bool deleteEdgeByIndex(int index);
 };
 
 class Graph
@@ -35,4 +36,7 @@ public:
     bool addNode(int key);
     bool deleteNodeByKey(int key);
     bool deleteNodeByIndex(int index);
+    void breadthFirstTraversal(int index);
+    void dfsTraversal(int index);
+    void dfsUtil(int index);
 };
