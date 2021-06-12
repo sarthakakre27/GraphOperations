@@ -37,6 +37,7 @@ public:
     bool deleteNodeByKey(int key);
     bool deleteNodeByIndex(int index);
     void breadthFirstTraversal(int index);
-    void dfsTraversal(int index);
-    void dfsUtil(int index);
+    void dfsTraversalWrap();
+    void dfsTraversal(int index,int* dfsvisited);
+    bool topologicalSort();
 };

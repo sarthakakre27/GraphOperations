@@ -257,10 +257,79 @@ void Graph::breadthFirstTraversal(int index)
     }
 }
 
-void Graph::dfsTraversal(int index)
+
+
+void Graph::dfsTraversalWrap()
 {
     static int* dfsvisited = new int[sizeof(Nodes)];
-    
+    memset(dfsvisited,false,sizeof(dfsvisited));
+
+    for(auto it:this->Nodes)
+    {
+        if( !dfsvisited[it.index] )
+        {
+            this->dfsTraversal(it.index,dfsvisited);
+        }
+    }
+
+}
+
+void Graph::dfsTraversal(int index,int* dfsvisited)
+{
+    dfsvisited[index] = true;
+    cout << "visiting node no." << index <<" ";
+
+    list<ListData>::iterator it;
+    for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+    {
+        if( !dfsvisited[it->index])
+        {
+            this->dfsTraversal(it->index,dfsvisited);
+        }
+    }
+}
+
+bool Graph::topologicalSort()
+{
+    //predecessor array
+    int* pred = new int[this->Nodes.size()];
+    memset(pred,0,sizeof(pred));
+
+    list<ListData>::iterator it;
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        for(it = this->Nodes[i].adjList.begin(); it != this->Nodes[i].adjList.end(); it++)
+        {
+            pred[it->index]++;
+        }
+    }
+
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        int j;
+        for(j = 0; j < this->Nodes.size(); j++)
+        {
+            if(pred[j] == 0)
+            {
+                break;//first node with 0 predecessor found
+            }
+        }
+        if(pred[j] != 0 && pred[j] != -1)
+            return false;
+
+        if(pred[j] == -1)//all node are exhausted
+            return true;
+        
+        //jth vertex does not have a predecessor
+        cout << j << " ";
+
+        list<ListData>::iterator it;
+        for(it = this->Nodes[j].adjList.begin(); it != this->Nodes[j].adjList.end(); it++)
+        {
+            pred[j] = -1;
+            pred[it->index]--;
+        }
+    }
 }
 
 int main()
