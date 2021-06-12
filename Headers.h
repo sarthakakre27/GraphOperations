@@ -7,6 +7,7 @@ class ListData
 public:
     int key;
     int index;
+    int weight;
     ListData(int key,int index);
 };
 
@@ -40,4 +41,14 @@ public:
     void dfsTraversalWrap();
     void dfsTraversal(int index,int* dfsvisited);
     bool topologicalSort();
+    void MSTprims();
+};
+
+class myComparator
+{
+public:
+    int operator() (const pair<pair<int,int>,int>& p1, const pair<pair<int,int>,int>& p2)
+    {
+        return p1.second > p2.second;
+    }
 };

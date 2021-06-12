@@ -332,6 +332,51 @@ bool Graph::topologicalSort()
     }
 }
 
+//MSTset --> {(base_node_index,edge_directed_to_index),weight}
+
+ void Graph::MSTprims()
+ {
+    vector<pair<pair<int,int>,int>> MSTset;
+    set<int> visited;
+    //min heap to extract min weight edge
+    priority_queue<pair<pair<int,int>,int>,vector<pair<pair<int,int>,int>>,myComparator> minHeap;
+    //starting from 0
+    visited.insert(0);
+    list<ListData>::iterator it;
+    for(it = this->Nodes[0].adjList.begin(); it != this->Nodes[0].adjList.end(); it++)
+    {
+        minHeap.push(make_pair(make_pair(0,it->index),it->weight));
+    }
+
+    while(MSTset.size() < (this->Nodes.size() - 1))
+    {
+        pair<pair<int,int>,int> top = minHeap.top();
+        if(visited.find(top.first.second) == visited.end())
+        {
+            visited.insert(top.first.second);
+            MSTset.push_back(make_pair(make_pair(top.first.first,top.first.second),top.second));
+            minHeap.pop();
+            for(it = (this->Nodes.begin() + top.first.second)->adjList.begin(); it != (this->Nodes.begin() + top.first.second)->adjList.end(); it++)
+            {
+                minHeap.push(make_pair(make_pair((this->Nodes.begin() + top.first.second)->index,it->index),it->weight));
+            }
+        }
+        else
+        {
+            minHeap.pop();
+        }
+    }
+
+    cout << "The MST is --> " << endl;
+
+    vector<pair<pair<int,int>,int>>::iterator i;
+    for(i = MSTset.begin();i != MSTset.end(); i++)
+    {
+        cout << "(" << i->first.first << " , " << i->first.second << ") ";
+    }
+
+ }
+
 int main()
 {
     return 0;
