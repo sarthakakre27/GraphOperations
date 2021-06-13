@@ -2,6 +2,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 class Graph;
+int found = 0;
 class ListData
 {
 public:
@@ -16,6 +17,7 @@ class Data
 public:
     int key;
     int index;
+    int data;
     list<ListData > adjList;
 
     Data(int key);
@@ -42,6 +44,11 @@ public:
     void dfsTraversal(int index,int* dfsvisited);
     bool topologicalSort();
     void MSTprims();
+    bool shortestPathFixedNode(int index);
+    void AllPairShortestPath();
+    void dfsSearchWrap(int data);
+    void dfsSearch(int Givedata,int index,int* dfsvisited);
+    void breadthFirstSearch(int index,int Givedata);
 };
 
 class myComparator

@@ -377,6 +377,166 @@ bool Graph::topologicalSort()
 
  }
 
+bool Graph::shortestPathFixedNode(int index)
+{
+    if(index > this->Nodes.size() || index < 0)
+    {
+        cout << "Invalid index" << endl;
+        return false;
+    }
+
+    int* found = new int[this->Nodes.size()];
+    memset(found,0,sizeof(found));
+
+    int* distance = new int[this->Nodes.size()];
+    memset(distance,INT_MAX,sizeof(distance));
+
+    int* prev = new int[this->Nodes.size()];
+    memset(prev,index,sizeof(prev));
+
+    found[index] = 1;
+    list<ListData>::iterator it;
+    for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+    {
+        distance[it->index] = it->weight;
+    }
+
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        int min = INT_MAX;
+        int min_ind = 0;
+        for(int j = 0; j < this->Nodes.size(); j++)
+        {
+            if(distance[j] < min && found[j] == 0)
+            {
+                min = distance[j];
+                min_ind = j;
+            }
+        }
+
+        found[min_ind] = 1;
+
+        for(it = this->Nodes[min_ind].adjList.begin(); it != this->Nodes[min_ind].adjList.end(); it++)
+        {
+            if(found[it->index] == 0 && (distance[min_ind] + it->weight < distance[it->index]))
+            {
+                distance[it->index] = distance[min_ind] + it->weight;
+                prev[it->index] = min_ind;
+            }
+        }
+    }
+}
+
+void Graph::AllPairShortestPath()
+{
+    vector<vector<int>> Dist(this->Nodes.size(),vector<int> (this->Nodes.size(),INT_MAX));
+
+    vector<vector<list<int>>> Path;
+
+    for(auto i : this->Nodes)
+    {
+        for(auto j : i.adjList)
+        {
+            Dist[i.index][j.index] = j.weight;
+            Path[i.index][j.index].push_back(1);//first node of the list marked as 1 to show the presence of edge
+        }
+    }
+
+    for(int k = 0; k < this->Nodes.size(); k++)
+    {
+        for(int i = 0; i < this->Nodes.size(); i++)
+        {
+            for(int j = 0; j < this->Nodes.size(); j++)
+            {
+                if(Dist[i][j] > Dist[i][k] + Dist[k][j])
+                {
+                    Dist[i][j] = Dist[i][k] + Dist[k][j];
+                    Path[i][j].push_back(k);
+                }
+            }
+        }
+    }
+}
+
+void Graph::dfsSearchWrap(int Givedata)
+{
+    int* dfsvisited = new int[sizeof(Nodes)];
+    memset(dfsvisited,false,sizeof(dfsvisited));
+
+    found = 0;
+
+    for(auto it:this->Nodes)
+    {
+        if( !dfsvisited[it.index] )
+        {
+            this->dfsSearch(Givedata,it.index,dfsvisited);
+        }
+    }
+
+}
+
+void Graph::dfsSearch(int Givedata,int index,int* dfsvisited)
+{   
+    dfsvisited[index] = true;
+    if(this->Nodes[index].data == Givedata)
+    {
+        cout << "Data found At Index - " << index;
+        return; 
+        found = 1;
+    }
+
+    list<ListData>::iterator it;
+    for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+    {
+        if( !dfsvisited[it->index])
+        {
+            this->dfsSearch(Givedata,it->index,dfsvisited);
+            if(found == 1)
+                return;
+        }
+    }
+}
+
+void Graph::breadthFirstSearch(int index,int Givedata)
+{
+    if(index < 0 || index > sizeof(this->Nodes))
+    {
+        cout<<"invalid index"<<endl;
+        return;//invalid index
+    }
+
+    bool* visited = new bool[this->Nodes.size()];
+    memset(visited,false,sizeof(visited));
+
+    list<int> queue;
+    visited[index] = true;
+
+    queue.push_back(index);
+
+    list<ListData>::iterator it;
+    while(!queue.empty())
+    {
+        index = queue.front();
+        //later appropriate data should be printed
+        if(this->Nodes[index].data == Givedata)
+        {
+            cout << "Found at index - " << index;
+            break;
+        }
+        queue.pop_front();
+
+        for(it = Nodes[index].adjList.begin(); it != Nodes[index].adjList.end(); it++)
+        {
+            if(!visited[it->index])
+            {
+                visited[it->index] = true;
+                queue.push_back(it->index);
+            }
+        }
+
+    }
+}
+
 int main()
 {
     return 0;
