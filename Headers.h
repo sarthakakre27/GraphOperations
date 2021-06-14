@@ -36,8 +36,8 @@ public:
 
     Graph();
     ~Graph();
-    bool addNode(int key);
-    bool deleteNodeByKey(int key);
+    bool addNode(int Givekey);
+    bool deleteNodeByKey(int Givekey);
     bool deleteNodeByIndex(int index);
     void breadthFirstTraversal(int index);
     void dfsTraversalWrap();

@@ -33,50 +33,50 @@ Graph::~Graph()
     }
 }
 
-bool Graph::addNode(int key)
+bool Graph::addNode(int Givekey)
 {
     vector<Data>::iterator it;
-    for(it = Nodes.begin(); it != Nodes.end(); it++)
+    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
     {
-        if(it->key == key)
+        if(it->key == Givekey)
         {
             cout<<"Already Exists"<<endl;
             return false;
         }
     }
     //else push the node
-    Nodes.push_back(Data(key));
-    Nodes[Nodes.size() - 1].index = Nodes.size() - 1;
+    Nodes.push_back(Data(Givekey));
+    Nodes[this->Nodes.size() - 1].index = this->Nodes.size() - 1;
     return true;
 }
 
-bool Graph::deleteNodeByKey(int key)
+bool Graph::deleteNodeByKey(int Givekey)
 {
     int found = 0;
     vector<Data>::iterator i;
-    for (i = Nodes.begin(); i != Nodes.end(); i++)
+    for (i = this->Nodes.begin(); i != this->Nodes.end(); i++)
     {
-        if (i->key == key)
+        if (i->key == Givekey)
         {
             break;
         }
     
     }
-    if (i != Nodes.end())//found index in the node vector
+    if (i != this->Nodes.end())//found index in the node vector
     {
-        int index = i->index;
+        int Foundindex = i->index;
         vector<Data>::iterator vecIt;
-        for(vecIt = Nodes.begin(); vecIt != Nodes.end(); vecIt++)
+        for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
         {
             list<ListData>::iterator lIt,eraseptr;
             found = 0;
             for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
             {
-                if(lIt->index > index)
+                if(lIt->index > Foundindex)
                 {
                     lIt->index--;
                 }
-                if(lIt->index == index)
+                if(lIt->index == Foundindex)
                 {
                     eraseptr = lIt;
                     found = 1;
@@ -87,10 +87,10 @@ bool Graph::deleteNodeByKey(int key)
                 vecIt->adjList.erase(eraseptr);
         }
         //after erasing the the incoming pointers erase the node
-        Nodes.erase(i);
-        for (int i = index; i < Nodes.size(); i++)
+        this->Nodes.erase(i);
+        for (int i = Foundindex; i < this->Nodes.size(); i++)
         {
-            Nodes[i].index = i;
+            this->Nodes[i].index = i;
         }
         return true;
     }
@@ -100,11 +100,11 @@ bool Graph::deleteNodeByKey(int key)
 bool Graph::deleteNodeByIndex(int index)
 {
     int found = 0;
-    if (index > Nodes.size() || index < 0)//invalid index
+    if (index > this->Nodes.size() || index < 0)//invalid index
         return false;
 
     vector<Data>::iterator vecIt;
-    for(vecIt = Nodes.begin(); vecIt != Nodes.end(); vecIt++)
+    for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
     {
         list<ListData>::iterator lIt,eraseptr;
         found = 0;
@@ -125,11 +125,11 @@ bool Graph::deleteNodeByIndex(int index)
             vecIt->adjList.erase(eraseptr);
     }
     //after erasing the the incoming pointers erase the node
-    vector<Data>::iterator i = Nodes.begin();
-    Nodes.erase(i + index);
-    for (int i = index; i < Nodes.size(); i++)
+    vector<Data>::iterator i = this->Nodes.begin();
+    this->Nodes.erase(i + index);
+    for (int i = index; i < this->Nodes.size(); i++)
     {
-        Nodes[i].index = i;
+        this->Nodes[i].index = i;
     }
     return true;
 }
@@ -223,7 +223,7 @@ bool Data::deleteEdgeByIndex(int Giveindex)
 
 void Graph::breadthFirstTraversal(int index)
 {
-    if(index < 0 || index > sizeof(Nodes))
+    if(index < 0 || index > sizeof(this->Nodes))
     {
         cout<<"invalid index"<<endl;
         return;//invalid index
@@ -245,7 +245,7 @@ void Graph::breadthFirstTraversal(int index)
         cout<<index<<" ";
         queue.pop_front();
 
-        for(it = Nodes[index].adjList.begin(); it != Nodes[index].adjList.end(); it++)
+        for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
         {
             if(!visited[it->index])
             {
@@ -261,7 +261,7 @@ void Graph::breadthFirstTraversal(int index)
 
 void Graph::dfsTraversalWrap()
 {
-    static int* dfsvisited = new int[sizeof(Nodes)];
+    static int* dfsvisited = new int[sizeof(this->Nodes)];
     memset(dfsvisited,false,sizeof(dfsvisited));
 
     for(auto it:this->Nodes)
