@@ -537,6 +537,101 @@ void Graph::breadthFirstSearch(int index,int Givedata)
     }
 }
 
+
+bool Graph::isCyclic()
+{
+    bool* visited = new bool[this->Nodes.size()];
+    bool* recStack = new bool[this->Nodes.size()];
+
+    memset(visited,false,sizeof(visited));
+    memset(recStack,false,sizeof(recStack));
+
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        if(this->isCyclicUtil(i,visited,recStack))
+            return true;
+        
+        return false;
+    }
+}
+
+bool Graph::isCyclicUtil(int index,bool* visited,bool* recStack)
+{
+    if(visited[index] == false)
+    {
+        visited[index] = true;
+        recStack[index] = true;
+
+        list<ListData>::iterator it;
+        for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+        {
+            if( !visited[it->index] && this->isCyclicUtil(it->index,visited,recStack))
+            {
+                return true;
+            }
+            else if(recStack[it->index])
+            {
+                return true;
+            }
+        }
+
+        recStack[index] = false;
+        return false;
+    }
+}
+
+void Graph::allPathsBetweenPairOfNodes(int index1, int index2)
+{
+    if((index1 < 0 || index1 > this->Nodes.size()) || (index2 < 0 || index2 > this->Nodes.size()))
+    {
+        cout << "invalid indices" << endl;
+        return;
+    }
+
+    bool* visited = new bool[this->Nodes.size()];
+    memset(visited,false,sizeof(visited));
+
+    int* path = new int[this->Nodes.size()];
+    int pathIndex = 0;
+
+    
+    this->allPathsBetweenPairOfNodesUtil(index1,index2,visited,path,pathIndex);
+    
+}
+
+
+void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,int* path,int& pathIndex)
+{
+    visited[index1] = true;
+    path[pathIndex] = index1;
+    pathIndex++;
+
+    if(index1 == index2)
+    {
+        for(int i = 0; i < pathIndex; i++)
+        {
+            cout << "Path - " << endl;
+            cout << path[i] << " ";
+        }
+        cout << endl;
+
+    }
+    else
+    {
+        list<ListData>::iterator it;
+        for(it = this->Nodes[index1].adjList.begin(); it != this->Nodes[index1].adjList.end(); it++)
+        {
+            if( !visited[it->index])
+            {
+                this->allPathsBetweenPairOfNodesUtil(it->index,index2,visited,path,pathIndex);
+            }
+        }
+    }
+
+    pathIndex--;
+    visited[index1] = false;
+}
+
 int main()
 {
     return 0;

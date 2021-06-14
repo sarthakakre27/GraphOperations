@@ -49,6 +49,10 @@ public:
     void dfsSearchWrap(int data);
     void dfsSearch(int Givedata,int index,int* dfsvisited);
     void breadthFirstSearch(int index,int Givedata);
+    bool isCyclic();
+    bool isCyclicUtil(int index,bool* visited,bool* recStack);
+    void allPathsBetweenPairOfNodes(int index1, int index2);
+    void allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,int* path,int& pathIndex);
 };
 
 class myComparator
