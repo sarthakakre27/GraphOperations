@@ -2,8 +2,8 @@
 using namespace std;
 #include"Headers.h"
 
-ListData::ListData(int key, int index)
-    :key(key),index(index)
+ListData::ListData(int key,int Giveweight, int index)
+    :key(key),index(index),weight(Giveweight)
 {
 }
 
@@ -134,7 +134,7 @@ bool Graph::deleteNodeByIndex(int index)
     return true;
 }
 
-bool Data::addEdgeByKey(int Givekey, Graph &g)
+bool Data::addEdgeByKey(int Givekey, int Giveweight, Graph &g)
 {
     if (this->key == Givekey) //avoiding self loops
         return false;
@@ -150,6 +150,7 @@ bool Data::addEdgeByKey(int Givekey, Graph &g)
     }
     if (d1 == g.Nodes.end())//key not found
     {
+        cout << "Key Not Found" << endl;
         return false;
     }
 
@@ -159,29 +160,37 @@ bool Data::addEdgeByKey(int Givekey, Graph &g)
     {
         if(it->index == d1->index)
         {
+            cout << "Already edge existing" << endl;
             return false;//already exists
         }
     }
 
     //else add an edge
-    this->adjList.push_back(ListData(Givekey,d1->index));//found and pushed
+    this->adjList.push_back(ListData(Givekey, Giveweight, d1->index));//found and pushed
     return true;
 }
 
-bool Data::addEdgeByIndex(int Giveindex, Graph& g)
+bool Data::addEdgeByIndex(int Giveindex, int Giveweight, Graph& g)
 {
     if(Giveindex > g.Nodes.size() || this->index == Giveindex || Giveindex < 0)//invalid index or self loop
+    {
+        cout << "Invalid Index" << endl;
         return false;//invalid index
+    }
 
     list<ListData>::iterator it;
     for(it = g.Nodes[this->index].adjList.begin(); it != g.Nodes[this->index].adjList.end(); it++)
     {
         if(it->index == Giveindex)
+        {
+            cout << "Already Exists" << endl;
             return false;//already edge exists
+        }
     }
 
-    g.Nodes[this->index].adjList.push_back(ListData(g.Nodes[Giveindex].key,Giveindex));//not found -- adding the edge
-        return true;
+    g.Nodes[this->index].adjList.push_back(ListData(g.Nodes[Giveindex].key, Giveweight, Giveindex));//not found -- adding the edge
+    cout << "Node Added" << endl;
+    return true;
     
 }
 
@@ -223,7 +232,7 @@ bool Data::deleteEdgeByIndex(int Giveindex)
 
 void Graph::breadthFirstTraversal(int index)
 {
-    if(index < 0 || index > sizeof(this->Nodes))
+    if(index < 0 || (index > this->Nodes.size()))
     {
         cout<<"invalid index"<<endl;
         return;//invalid index
@@ -242,7 +251,7 @@ void Graph::breadthFirstTraversal(int index)
     {
         index = queue.front();
         //later appropriate data should be printed
-        cout<<index<<" ";
+        cout << index << " ";
         queue.pop_front();
 
         for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
@@ -261,7 +270,7 @@ void Graph::breadthFirstTraversal(int index)
 
 void Graph::dfsTraversalWrap()
 {
-    static int* dfsvisited = new int[sizeof(this->Nodes)];
+    int* dfsvisited = new int[sizeof(this->Nodes)];
     memset(dfsvisited,false,sizeof(dfsvisited));
 
     for(auto it:this->Nodes)
@@ -322,11 +331,11 @@ bool Graph::topologicalSort()
         
         //jth vertex does not have a predecessor
         cout << j << " ";
+        pred[j] = -1;//visited
 
         list<ListData>::iterator it;
         for(it = this->Nodes[j].adjList.begin(); it != this->Nodes[j].adjList.end(); it++)
         {
-            pred[j] = -1;
             pred[it->index]--;
         }
     }

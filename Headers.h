@@ -9,7 +9,7 @@ public:
     int key;
     int index;
     int weight;
-    ListData(int key,int index);
+    ListData(int key, int Giveweight,int index);
 };
 
 class Data
@@ -22,8 +22,8 @@ public:
 
     Data(int key);
     ~Data();
-    bool addEdgeByKey(int key, Graph &g);
-    bool addEdgeByIndex(int index, Graph& g);
+    bool addEdgeByKey(int key,int Giveweight, Graph &g);
+    bool addEdgeByIndex(int index,int Giveweight, Graph& g);
     bool deleteEdgeByKey(int Givekey);
     bool deleteEdgeByIndex(int index);
 };
