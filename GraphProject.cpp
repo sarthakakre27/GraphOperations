@@ -239,7 +239,7 @@ void Graph::breadthFirstTraversal(int index)
     }
 
     bool* visited = new bool[this->Nodes.size()];
-    memset(visited,false,sizeof(visited));
+    memset(visited,false,this->Nodes.size()*sizeof(bool));
 
     list<int> queue;
     visited[index] = true;
@@ -270,8 +270,8 @@ void Graph::breadthFirstTraversal(int index)
 
 void Graph::dfsTraversalWrap()
 {
-    int* dfsvisited = new int[sizeof(this->Nodes)];
-    memset(dfsvisited,false,sizeof(dfsvisited));
+    int* dfsvisited = new int[this->Nodes.size()];
+    memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
 
     for(auto it:this->Nodes)
     {
@@ -302,7 +302,7 @@ bool Graph::topologicalSort()
 {
     //predecessor array
     int* pred = new int[this->Nodes.size()];
-    memset(pred,0,sizeof(pred));
+    memset(pred,0,this->Nodes.size()*sizeof(int));
 
     list<ListData>::iterator it;
     for(int i = 0; i < this->Nodes.size(); i++)
@@ -395,13 +395,13 @@ bool Graph::shortestPathFixedNode(int index)
     }
 
     int* found = new int[this->Nodes.size()];
-    memset(found,0,sizeof(found));
+    memset(found,0,this->Nodes.size()*sizeof(int));
 
     int* distance = new int[this->Nodes.size()];
-    memset(distance,INT_MAX,sizeof(distance));
+    memset(distance,INT_MAX,this->Nodes.size()*sizeof(int));
 
     int* prev = new int[this->Nodes.size()];
-    memset(prev,index,sizeof(prev));
+    memset(prev,index,this->Nodes.size()*sizeof(int));
 
     found[index] = 1;
     list<ListData>::iterator it;
@@ -469,8 +469,8 @@ void Graph::AllPairShortestPath()
 
 void Graph::dfsSearchWrap(int Givedata)
 {
-    int* dfsvisited = new int[sizeof(Nodes)];
-    memset(dfsvisited,false,sizeof(dfsvisited));
+    int* dfsvisited = new int[this->Nodes.size()];
+    memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
 
     found = 0;
 
@@ -515,7 +515,7 @@ void Graph::breadthFirstSearch(int index,int Givedata)
     }
 
     bool* visited = new bool[this->Nodes.size()];
-    memset(visited,false,sizeof(visited));
+    memset(visited,false,this->Nodes.size()*sizeof(bool));
 
     list<int> queue;
     visited[index] = true;
@@ -552,8 +552,8 @@ bool Graph::isCyclic()
     bool* visited = new bool[this->Nodes.size()];
     bool* recStack = new bool[this->Nodes.size()];
 
-    memset(visited,false,sizeof(visited));
-    memset(recStack,false,sizeof(recStack));
+    memset(visited,false,this->Nodes.size()*sizeof(bool));
+    memset(recStack,false,this->Nodes.size()*sizeof(bool));
 
     for(int i = 0; i < this->Nodes.size(); i++)
     {
@@ -598,7 +598,7 @@ void Graph::allPathsBetweenPairOfNodes(int index1, int index2)
     }
 
     bool* visited = new bool[this->Nodes.size()];
-    memset(visited,false,sizeof(visited));
+    memset(visited,false,this->Nodes.size()*sizeof(bool));
 
     int* path = new int[this->Nodes.size()];
     int pathIndex = 0;
