@@ -1,6 +1,9 @@
 
 #include<bits/stdc++.h>
 using namespace std;
+//#include"Data.h"
+#include"EducationalInstitute.h"
+
 class Graph;
 int found = 0;
 class ListData
@@ -19,6 +22,12 @@ public:
     int index;
     int data;
     list<ListData > adjList;
+
+    //personal details -->
+    string name;
+    string address;
+    list<educatinalInstitute> EducationList;
+    list<string> hobbies;
 
     Data(int key);
     ~Data();

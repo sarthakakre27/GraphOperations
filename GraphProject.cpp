@@ -2,16 +2,16 @@
 using namespace std;
 #include"Headers.h"
 
-ListData::ListData(int key,int Giveweight, int index)
-    :key(key),index(index),weight(Giveweight)
+ListData::ListData(int Givekey,int Giveweight, int Giveindex)
+    :key(Givekey),index(Giveindex),weight(Giveweight)
 {
 }
 
 
 
-Data::Data(int key)
+Data::Data(int Givekey)
 {
-    this->key = key;
+    this->key = Givekey;
 }
 
 Data::~Data()
@@ -27,7 +27,7 @@ Graph::Graph()
 
 Graph::~Graph()
 {
-    for (int i = 0; i < Nodes.size(); i++)
+    for (int i = 0; i < this->Nodes.size(); i++)
     {
         Nodes[i].~Data();
     }
@@ -76,7 +76,7 @@ bool Graph::deleteNodeByKey(int Givekey)
                 {
                     lIt->index--;
                 }
-                if(lIt->index == Foundindex)
+                else if(lIt->index == Foundindex)
                 {
                     eraseptr = lIt;
                     found = 1;
@@ -97,10 +97,10 @@ bool Graph::deleteNodeByKey(int Givekey)
     return false;//key not found
 }
 
-bool Graph::deleteNodeByIndex(int index)
+bool Graph::deleteNodeByIndex(int Giveindex)
 {
     int found = 0;
-    if (index > this->Nodes.size() || index < 0)//invalid index
+    if (Giveindex > this->Nodes.size() || Giveindex < 0)//invalid index
         return false;
 
     vector<Data>::iterator vecIt;
@@ -110,11 +110,11 @@ bool Graph::deleteNodeByIndex(int index)
         found = 0;
         for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
         {
-            if(lIt->index > index)
+            if(lIt->index > Giveindex)
             {
                 lIt->index--;
             }
-            if(lIt->index == index)
+            else if(lIt->index == Giveindex)
             {
                 eraseptr = lIt;
                 found = 1;
@@ -126,10 +126,10 @@ bool Graph::deleteNodeByIndex(int index)
     }
     //after erasing the the incoming pointers erase the node
     vector<Data>::iterator i = this->Nodes.begin();
-    this->Nodes.erase(i + index);
-    for (int i = index; i < this->Nodes.size(); i++)
+    this->Nodes.erase(i + Giveindex);
+    for (int j = Giveindex; j < this->Nodes.size(); j++)
     {
-        this->Nodes[i].index = i;
+        this->Nodes[j].index = j;
     }
     return true;
 }
@@ -189,7 +189,7 @@ bool Data::addEdgeByIndex(int Giveindex, int Giveweight, Graph& g)
     }
 
     g.Nodes[this->index].adjList.push_back(ListData(g.Nodes[Giveindex].key, Giveweight, Giveindex));//not found -- adding the edge
-    cout << "Node Added" << endl;
+    cout << "Edge Added" << endl;
     return true;
     
 }
@@ -239,7 +239,11 @@ void Graph::breadthFirstTraversal(int index)
     }
 
     bool* visited = new bool[this->Nodes.size()];
-    memset(visited,false,this->Nodes.size()*sizeof(bool));
+    //memset(visited,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        visited[i] = false;
+    }
 
     list<int> queue;
     visited[index] = true;
@@ -271,7 +275,11 @@ void Graph::breadthFirstTraversal(int index)
 void Graph::dfsTraversalWrap()
 {
     int* dfsvisited = new int[this->Nodes.size()];
-    memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
+    //memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        dfsvisited[i] = false;
+    }
 
     for(auto it:this->Nodes)
     {
@@ -386,9 +394,9 @@ bool Graph::topologicalSort()
 
  }
 
-bool Graph::shortestPathFixedNode(int index)
+bool Graph::shortestPathFixedNode(int Giveindex)
 {
-    if(index > this->Nodes.size() || index < 0)
+    if(Giveindex > this->Nodes.size() || Giveindex < 0)
     {
         cout << "Invalid index" << endl;
         return false;
@@ -396,16 +404,25 @@ bool Graph::shortestPathFixedNode(int index)
 
     int* found = new int[this->Nodes.size()];
     memset(found,0,this->Nodes.size()*sizeof(int));
+    cout<<endl;
 
     int* distance = new int[this->Nodes.size()];
-    memset(distance,INT_MAX,this->Nodes.size()*sizeof(int));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        distance[i] = INT_MAX;
+    }
+
 
     int* prev = new int[this->Nodes.size()];
-    memset(prev,index,this->Nodes.size()*sizeof(int));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        prev[i] = Giveindex;
+    }
 
-    found[index] = 1;
+    found[Giveindex] = 1;
+    distance[Giveindex] = 0;
     list<ListData>::iterator it;
-    for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+    for(it = this->Nodes[Giveindex].adjList.begin(); it != this->Nodes[Giveindex].adjList.end(); it++)
     {
         distance[it->index] = it->weight;
     }
@@ -433,6 +450,11 @@ bool Graph::shortestPathFixedNode(int index)
                 prev[it->index] = min_ind;
             }
         }
+    }
+
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        cout<<distance[i]<<" ";
     }
 }
 
@@ -470,7 +492,11 @@ void Graph::AllPairShortestPath()
 void Graph::dfsSearchWrap(int Givedata)
 {
     int* dfsvisited = new int[this->Nodes.size()];
-    memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
+    //memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        dfsvisited[i] = false;
+    }
 
     found = 0;
 
@@ -515,7 +541,11 @@ void Graph::breadthFirstSearch(int index,int Givedata)
     }
 
     bool* visited = new bool[this->Nodes.size()];
-    memset(visited,false,this->Nodes.size()*sizeof(bool));
+    //memset(visited,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        visited[i] = false;
+    }
 
     list<int> queue;
     visited[index] = true;
@@ -552,8 +582,16 @@ bool Graph::isCyclic()
     bool* visited = new bool[this->Nodes.size()];
     bool* recStack = new bool[this->Nodes.size()];
 
-    memset(visited,false,this->Nodes.size()*sizeof(bool));
-    memset(recStack,false,this->Nodes.size()*sizeof(bool));
+    //memset(visited,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        visited[i] = false;
+    }
+    //memset(recStack,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        recStack[i] = false;
+    }
 
     for(int i = 0; i < this->Nodes.size(); i++)
     {
@@ -598,7 +636,11 @@ void Graph::allPathsBetweenPairOfNodes(int index1, int index2)
     }
 
     bool* visited = new bool[this->Nodes.size()];
-    memset(visited,false,this->Nodes.size()*sizeof(bool));
+    //memset(visited,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        visited[i] = false;
+    }
 
     int* path = new int[this->Nodes.size()];
     int pathIndex = 0;
@@ -643,5 +685,105 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
 
 int main()
 {
+
+    // Graph g;
+    // g.addNode(0);
+    // g.addNode(1);
+    // g.addNode(2);
+    // g.addNode(3);
+    // g.addNode(4);
+    // g.addNode(5);
+    // g.addNode(6);
+    // g.addNode(7);
+    // g.Nodes[0].addEdgeByIndex(1,10,g);
+    // g.Nodes[1].addEdgeByIndex(3,10,g);
+    // g.Nodes[1].addEdgeByIndex(4,10,g);
+    // g.Nodes[4].addEdgeByIndex(7,10,g);
+    // g.Nodes[3].addEdgeByIndex(7,10,g);
+    // g.Nodes[7].addEdgeByIndex(5,10,g);
+    // g.Nodes[7].addEdgeByIndex(6,10,g);
+    // g.Nodes[5].addEdgeByIndex(2,10,g);
+    // g.Nodes[6].addEdgeByIndex(2,10,g);
+    // g.Nodes[2].addEdgeByIndex(0,10,g);
+
+    // cout << endl;
+    // g.Nodes[2].deleteEdgeByIndex(0);
+    // g.topologicalSort();
+    // cout << endl;
+
+    // g.deleteNodeByIndex(5);
+    // vector<Data>::iterator it = g.Nodes.begin();
+    // list<ListData>::iterator j;
+    // for(it = g.Nodes.begin();it != g.Nodes.end(); it++)
+    // {
+    //     cout<<it->index<<" ";
+    //     for(j = g.Nodes[it->index].adjList.begin(); j!=g.Nodes[it->index].adjList.end();j++)
+    //     {
+    //         cout<<j->index<<"-";
+    //     }
+    //     cout<<endl;
+
+    // }
+    // g.deleteNodeByKey(4);
+    // for(it = g.Nodes.begin();it != g.Nodes.end(); it++)
+    // {
+    //     cout<<it->index<<" ";
+    //     for(j = g.Nodes[it->index].adjList.begin(); j!=g.Nodes[it->index].adjList.end();j++)
+    //     {
+    //         cout<<j->index<<"-";
+    //     }
+    //     cout<<endl;
+
+    // }
+    
+    // g.dfsTraversalWrap();
+    // cout<<endl;
+    // g.breadthFirstTraversal(0);
+
+    // cout<<"\n\n";
+    // Graph g1;
+    // g1.addNode(0);
+    // g1.addNode(1);
+    // g1.addNode(2);
+    // g1.addNode(3);
+    // g1.Nodes[0].addEdgeByIndex(1,3,g1);
+    // g1.Nodes[1].addEdgeByIndex(0,3,g1);
+    // g1.Nodes[0].addEdgeByIndex(2,3,g1);
+    // g1.Nodes[2].addEdgeByIndex(0,3,g1);
+    // g1.Nodes[1].addEdgeByIndex(2,2,g1);
+    // g1.Nodes[2].addEdgeByIndex(1,2,g1);
+    // g1.Nodes[2].addEdgeByIndex(3,2,g1);
+    // g1.Nodes[3].addEdgeByIndex(2,2,g1);
+    // g1.Nodes[3].addEdgeByIndex(1,3,g1);
+    // g1.Nodes[1].addEdgeByIndex(3,3,g1);
+    // g1.MSTprims();
+
+    Graph g2;
+    g2.addNode(0);
+    g2.addNode(1);
+    g2.addNode(2);
+    g2.addNode(3);
+    g2.addNode(4);
+
+    g2.Nodes[0].addEdgeByIndex(1,2,g2);
+    g2.Nodes[0].addEdgeByIndex(2,5,g2);
+    g2.Nodes[0].addEdgeByIndex(4,3,g2);
+
+    g2.Nodes[1].addEdgeByIndex(2,6,g2);
+    g2.Nodes[1].addEdgeByIndex(4,10,g2);
+    g2.Nodes[1].addEdgeByIndex(3,4,g2);
+
+    g2.Nodes[2].addEdgeByIndex(4,2,g2);
+    g2.Nodes[2].addEdgeByIndex(3,6,g2);
+
+    g2.Nodes[4].addEdgeByIndex(2,1,g2);
+    g2.Nodes[4].addEdgeByIndex(3,2,g2);
+
+    g2.shortestPathFixedNode(0);
+    //cout<<INT_MAX;
+
+
+
+
     return 0;
 }
