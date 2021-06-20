@@ -549,6 +549,7 @@ void Graph::AllPairShortestPath()
     }
 }
 
+
 void Graph::dfsSearchWrap(int Givedata)
 {
     int* dfsvisited = new int[this->Nodes.size()];
@@ -591,6 +592,58 @@ void Graph::dfsSearch(int Givedata,int index,int* dfsvisited)
                 return;
         }
     }
+}
+
+
+int Graph::dfsSearchWrapID(int Givekey)
+{
+    int ret_val = -1;
+    int* dfsvisited = new int[this->Nodes.size()];
+    //memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        dfsvisited[i] = false;
+    }
+
+    found = 0;
+
+    vector<Data>::iterator it;
+    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
+    {
+        if( !dfsvisited[it->index] )
+        {
+            ret_val = this->dfsSearchID(Givekey,it->index,dfsvisited);
+            if(ret_val != -1)
+                return ret_val;
+        }
+    }
+
+    return ret_val;
+
+}
+
+int Graph::dfsSearchID(int Givekey,int index,int* dfsvisited)
+{   
+    int ret_val = -1;
+    dfsvisited[index] = true;
+    if(this->Nodes[index].key == Givekey)
+    {
+        cout << "Data found At Index - " << index << endl;
+        found = 1;
+        return index; 
+    }
+
+    list<ListData>::iterator it;
+    for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+    {
+        if( !dfsvisited[it->index])
+        {
+            ret_val = this->dfsSearchID(Givekey,it->index,dfsvisited);
+            if(found == 1)
+                return ret_val;
+        }
+    }
+    return -1;
 }
 
 void Graph::breadthFirstSearch(int index,int Givedata)
@@ -742,6 +795,38 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
 
     pathIndex--;
     visited[index1] = false;
+}
+
+void Graph::addEdge(int selfkey,int tokey)
+{
+    cout << "hi" << endl;
+    int selfindex = dfsSearchWrapID(selfkey);
+    cout << selfindex << endl;
+    int toindex = dfsSearchWrapID(tokey);
+    cout << toindex << endl;
+    if(selfindex == -1)
+    {
+        cout << "Enter valid Id -- > ID NOT FOUND!" << endl;
+        return;
+    }
+    if(toindex == -1)
+    {
+        cout << "Enter valid ID for the connection to make -- > ID to connect NOT FOUND!" << endl;
+        return;
+    }
+    int wt = -1;//weight for the edge //for the application it is the factor that
+    //how much the person the connection is made to is familiar to him/her
+    cout << "hi2" << endl;
+    while(wt < 0 || wt > 101)
+    {
+        cout << "hi3" << endl;
+        cout << "How nicely Do you know the person you are connecting...on a scale of 0 - 100" << endl;
+        cout << "0 - least | 100 - most" << endl;
+        cin  >> wt;
+    }
+
+    //both ids are found so add the edge
+    this->Nodes[selfindex].addEdgeByIndex(toindex,100 - wt,*this);
 }
 
 /*------------------------------------------------DATE CLASS MEMBER METHODS-----------------------------------------------*/
@@ -924,8 +1009,8 @@ int main()
     g2.Nodes[0].addEdgeByIndex(2,5,g2);
     g2.Nodes[1].addEdgeByIndex(3,2,g2);
     g2.Nodes[2].addEdgeByIndex(3,1,g2);
-    g2.Nodes[0].addEdgeByIndex(3,4,g2);
-
+    //g2.Nodes[0].addEdgeByIndex(3,4,g2);
+    g2.addEdge(0,3);
     cout << g2.isCyclic();
 
     g2.breadthFirstSearch(0,800);

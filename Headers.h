@@ -47,6 +47,7 @@ public:
     bool addNode(int Givekey,int Givedata);
     bool deleteNodeByKey(int Givekey);
     bool deleteNodeByIndex(int index);
+    void addEdge(int selfkey,int tokey);
     void breadthFirstTraversal(int index);
     void dfsTraversalWrap();
     void dfsTraversal(int index,int* dfsvisited);
@@ -54,8 +55,10 @@ public:
     void MSTprims();
     bool shortestPathFixedNode(int Giveindex);
     void AllPairShortestPath();
-    void dfsSearchWrap(int data);
+    void dfsSearchWrap(int Givedata);
     void dfsSearch(int Givedata,int index,int* dfsvisited);
+    int dfsSearchWrapID(int givekey);
+    int dfsSearchID(int Givekey,int index,int* dfsvisited);
     void breadthFirstSearch(int index,int Givedata);
     bool isCyclic();
     bool isCyclicUtil(int index,bool* visited,bool* recStack);
