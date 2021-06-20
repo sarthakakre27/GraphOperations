@@ -2,16 +2,24 @@
 using namespace std;
 #include"Headers.h"
 
+
+/*-----------------------------------------LISTDATA MEMBER METHODS--------------------------------------------*/
 ListData::ListData(int Givekey,int Giveweight, int Giveindex)
     :key(Givekey),index(Giveindex),weight(Giveweight)
 {
 }
 
 
-
+/*-----------------------------------------DATA CLASS MEMBER METHODS-----------------------------------------*/
 Data::Data(int Givekey)
 {
     this->key = Givekey;
+}
+
+Data::Data(int Givekey,int Givedata)
+{
+    this->key = Givekey;
+    this->data = Givedata;
 }
 
 Data::~Data()
@@ -19,120 +27,6 @@ Data::~Data()
     this->adjList.clear();
 }
 
-
-
-Graph::Graph()
-{
-}
-
-Graph::~Graph()
-{
-    for (int i = 0; i < this->Nodes.size(); i++)
-    {
-        Nodes[i].~Data();
-    }
-}
-
-bool Graph::addNode(int Givekey)
-{
-    vector<Data>::iterator it;
-    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
-    {
-        if(it->key == Givekey)
-        {
-            cout<<"Already Exists"<<endl;
-            return false;
-        }
-    }
-    //else push the node
-    Nodes.push_back(Data(Givekey));
-    Nodes[this->Nodes.size() - 1].index = this->Nodes.size() - 1;
-    return true;
-}
-
-bool Graph::deleteNodeByKey(int Givekey)
-{
-    int found = 0;
-    vector<Data>::iterator i;
-    for (i = this->Nodes.begin(); i != this->Nodes.end(); i++)
-    {
-        if (i->key == Givekey)
-        {
-            break;
-        }
-    
-    }
-    if (i != this->Nodes.end())//found index in the node vector
-    {
-        int Foundindex = i->index;
-        vector<Data>::iterator vecIt;
-        for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
-        {
-            list<ListData>::iterator lIt,eraseptr;
-            found = 0;
-            for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
-            {
-                if(lIt->index > Foundindex)
-                {
-                    lIt->index--;
-                }
-                else if(lIt->index == Foundindex)
-                {
-                    eraseptr = lIt;
-                    found = 1;
-                    //erase the incoming pointers to the node to be deleted
-                }
-            }
-            if(found == 1)
-                vecIt->adjList.erase(eraseptr);
-        }
-        //after erasing the the incoming pointers erase the node
-        this->Nodes.erase(i);
-        for (int i = Foundindex; i < this->Nodes.size(); i++)
-        {
-            this->Nodes[i].index = i;
-        }
-        return true;
-    }
-    return false;//key not found
-}
-
-bool Graph::deleteNodeByIndex(int Giveindex)
-{
-    int found = 0;
-    if (Giveindex > this->Nodes.size() || Giveindex < 0)//invalid index
-        return false;
-
-    vector<Data>::iterator vecIt;
-    for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
-    {
-        list<ListData>::iterator lIt,eraseptr;
-        found = 0;
-        for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
-        {
-            if(lIt->index > Giveindex)
-            {
-                lIt->index--;
-            }
-            else if(lIt->index == Giveindex)
-            {
-                eraseptr = lIt;
-                found = 1;
-                //erase the incoming pointers to the node to be deleted
-            }
-        }
-        if(found == 1)
-            vecIt->adjList.erase(eraseptr);
-    }
-    //after erasing the the incoming pointers erase the node
-    vector<Data>::iterator i = this->Nodes.begin();
-    this->Nodes.erase(i + Giveindex);
-    for (int j = Giveindex; j < this->Nodes.size(); j++)
-    {
-        this->Nodes[j].index = j;
-    }
-    return true;
-}
 
 bool Data::addEdgeByKey(int Givekey, int Giveweight, Graph &g)
 {
@@ -228,6 +122,121 @@ bool Data::deleteEdgeByIndex(int Giveindex)
         return true;
     }
     return false;
+}
+
+/*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
+
+Graph::Graph()
+{
+}
+
+Graph::~Graph()
+{
+    for (int i = 0; i < this->Nodes.size(); i++)
+    {
+        Nodes[i].~Data();
+    }
+}
+
+bool Graph::addNode(int Givekey,int Givedata)
+{
+    vector<Data>::iterator it;
+    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
+    {
+        if(it->key == Givekey)
+        {
+            cout<<"Already Exists"<<endl;
+            return false;
+        }
+    }
+    //else push the node
+    Nodes.push_back(Data(Givekey,Givedata));
+    Nodes[this->Nodes.size() - 1].index = this->Nodes.size() - 1;
+    return true;
+}
+
+bool Graph::deleteNodeByKey(int Givekey)
+{
+    int found = 0;
+    vector<Data>::iterator i;
+    for (i = this->Nodes.begin(); i != this->Nodes.end(); i++)
+    {
+        if (i->key == Givekey)
+        {
+            break;
+        }
+    
+    }
+    if (i != this->Nodes.end())//found index in the node vector
+    {
+        int Foundindex = i->index;
+        vector<Data>::iterator vecIt;
+        for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
+        {
+            list<ListData>::iterator lIt,eraseptr;
+            found = 0;
+            for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
+            {
+                if(lIt->index > Foundindex)
+                {
+                    lIt->index--;
+                }
+                else if(lIt->index == Foundindex)
+                {
+                    eraseptr = lIt;
+                    found = 1;
+                    //erase the incoming pointers to the node to be deleted
+                }
+            }
+            if(found == 1)
+                vecIt->adjList.erase(eraseptr);
+        }
+        //after erasing the the incoming pointers erase the node
+        this->Nodes.erase(i);
+        for (int i = Foundindex; i < this->Nodes.size(); i++)
+        {
+            this->Nodes[i].index = i;
+        }
+        return true;
+    }
+    return false;//key not found
+}
+
+bool Graph::deleteNodeByIndex(int Giveindex)
+{
+    int found = 0;
+    if (Giveindex > this->Nodes.size() || Giveindex < 0)//invalid index
+        return false;
+
+    vector<Data>::iterator vecIt;
+    for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
+    {
+        list<ListData>::iterator lIt,eraseptr;
+        found = 0;
+        for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
+        {
+            if(lIt->index > Giveindex)
+            {
+                lIt->index--;
+            }
+            else if(lIt->index == Giveindex)
+            {
+                eraseptr = lIt;
+                found = 1;
+                //erase the incoming pointers to the node to be deleted
+            }
+        }
+        if(found == 1)
+            vecIt->adjList.erase(eraseptr);
+    }
+    //after erasing the the incoming pointers erase the node
+    vector<Data>::iterator i = this->Nodes.begin();
+    this->Nodes.erase(i + Giveindex);
+    for (int j = Giveindex; j < this->Nodes.size(); j++)
+    {
+        this->Nodes[j].index = j;
+    }
+    return true;
 }
 
 void Graph::breadthFirstTraversal(int index)
@@ -456,36 +465,87 @@ bool Graph::shortestPathFixedNode(int Giveindex)
     {
         cout<<distance[i]<<" ";
     }
+    cout << endl;
+    // for(int i = 0; i < this->Nodes.size(); i++)
+    // {
+    //     cout<<prev[i]<<" ";
+    // }
+    // cout << "\n" <<Giveindex<<endl;
+    // cout << "Paths --> "<< endl;
+    // for(int i = 0; i < this->Nodes.size(); i++)
+    // {
+    //     int j = this->Nodes[i].index;
+    //     cout<<prev[j] <<"<-";
+    //     //cout<<Giveindex<<" ";
+    //     while(prev[j] != Giveindex);
+    //     {
+    //         cout << prev[j] << "<-";  
+    //         j = this->Nodes[prev[j]].index;
+    //     }
+    //     cout <<endl;
+    // }
 }
 
 void Graph::AllPairShortestPath()
 {
+    cout << "hi" <<endl;
     vector<vector<int>> Dist(this->Nodes.size(),vector<int> (this->Nodes.size(),INT_MAX));
-
-    vector<vector<list<int>>> Path;
-
-    for(auto i : this->Nodes)
+    for(int i = 0; i < this->Nodes.size(); i++)
     {
-        for(auto j : i.adjList)
+        for(int j = 0; j < this->Nodes.size(); j++)
         {
-            Dist[i.index][j.index] = j.weight;
-            Path[i.index][j.index].push_back(1);//first node of the list marked as 1 to show the presence of edge
+            cout << Dist[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    //vector<vector<vector<int>>> Path;
+    cout << "hi" <<endl;
+    vector<Data>::iterator it;
+    list<ListData>::iterator jt;
+    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
+    {
+        //cout << "hi" <<endl;
+        for(jt = it->adjList.begin(); jt != it->adjList.end(); jt++)
+        {
+            Dist[it->index][jt->index] = jt->weight;
+            cout << "hi" <<endl;
+            //Path[it->index][jt->index].push_back(1);//first node of the list marked as 1 to show the presence of edge
         }
     }
 
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        for(int j = 0; j < this->Nodes.size(); j++)
+        {
+            cout << Dist[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    cout << "hi" <<endl;
     for(int k = 0; k < this->Nodes.size(); k++)
     {
         for(int i = 0; i < this->Nodes.size(); i++)
         {
             for(int j = 0; j < this->Nodes.size(); j++)
             {
-                if(Dist[i][j] > Dist[i][k] + Dist[k][j])
+                if(Dist[i][j] > Dist[i][k] + Dist[k][j] && (Dist[k][j] != INT_MAX && Dist[i][k] != INT_MAX))
                 {
                     Dist[i][j] = Dist[i][k] + Dist[k][j];
-                    Path[i][j].push_back(k);
+                    //Path[i][j].push_back(k);
                 }
             }
         }
+    }
+    cout << "hi" <<endl;
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        for(int j = 0; j < this->Nodes.size(); j++)
+        {
+            cout << Dist[i][j] << " ";
+        }
+        cout << endl;
     }
 }
 
@@ -500,11 +560,12 @@ void Graph::dfsSearchWrap(int Givedata)
 
     found = 0;
 
-    for(auto it:this->Nodes)
+    vector<Data>::iterator it;
+    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
     {
-        if( !dfsvisited[it.index] )
+        if( !dfsvisited[it->index] )
         {
-            this->dfsSearch(Givedata,it.index,dfsvisited);
+            this->dfsSearch(Givedata,it->index,dfsvisited);
         }
     }
 
@@ -515,9 +576,9 @@ void Graph::dfsSearch(int Givedata,int index,int* dfsvisited)
     dfsvisited[index] = true;
     if(this->Nodes[index].data == Givedata)
     {
-        cout << "Data found At Index - " << index;
-        return; 
+        cout << "Data found At Index - " << index << endl;
         found = 1;
+        return; 
     }
 
     list<ListData>::iterator it;
@@ -536,7 +597,7 @@ void Graph::breadthFirstSearch(int index,int Givedata)
 {
     if(index < 0 || index > sizeof(this->Nodes))
     {
-        cout<<"invalid index"<<endl;
+        cout << "invalid index" << endl;
         return;//invalid index
     }
 
@@ -559,7 +620,7 @@ void Graph::breadthFirstSearch(int index,int Givedata)
         //later appropriate data should be printed
         if(this->Nodes[index].data == Givedata)
         {
-            cout << "Found at index - " << index;
+            cout << "Found at index - " << index << endl;
             break;
         }
         queue.pop_front();
@@ -659,9 +720,9 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
 
     if(index1 == index2)
     {
+        cout << "Path - " << endl;
         for(int i = 0; i < pathIndex; i++)
         {
-            cout << "Path - " << endl;
             cout << path[i] << " ";
         }
         cout << endl;
@@ -682,6 +743,74 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
     pathIndex--;
     visited[index1] = false;
 }
+
+/*------------------------------------------------DATE CLASS MEMBER METHODS-----------------------------------------------*/
+date::date(int giveDay,int giveMonth, int giveYear)
+    :day(giveDay),month(giveMonth),year(giveYear)
+{
+
+}
+
+void date::setDate()
+{
+    cout << "Enter date - "<< endl;
+    cout << "Enter day (1-28/29/30/31) - " << endl;
+    int flag = 0;
+    while( !flag )
+    {
+        cin >> this->day;
+        if(this->day > 31 || this->day < 1)
+        {
+            cout << "Enter valid date - " << endl;
+        }
+        else
+        {
+            flag = 1;//valid day found
+        }
+    }
+    flag = 0;
+    cout << "Enter Month (1-12) - " << endl;
+
+    while( !flag )
+    {
+        cin >> this->month;
+        if(this->month < 1 || this->month > 12)
+        {
+            cout << "Enter a valid Month - " << endl;
+        }
+        else
+        {
+            flag = 1;
+        }
+    }
+
+    flag = 0;
+    cout << "Enter Year (1900 - 2021) - " << endl;
+
+    while( !flag )
+    {
+        cin >> this->year;
+        if(this->year < 1900 || this->year > 2021)
+        {
+            cout << "Enter a valid Year - " << endl;
+        }
+        else
+        {
+            flag = 1;
+        }
+    }
+}
+
+
+/*--------------------------------------EDUCATIONAL INSTITUTE CLASS MEMBER METHODS-----------------------------------------*/
+educatinalInstitute::educatinalInstitute(string giveInstituteName, date givestartDate, date giveendDate)
+{
+    this->InstituteName = giveInstituteName;
+    this->startDate = givestartDate;
+    this->endDate = giveendDate;
+}
+
+
 
 int main()
 {
@@ -758,29 +887,50 @@ int main()
     // g1.Nodes[1].addEdgeByIndex(3,3,g1);
     // g1.MSTprims();
 
-    Graph g2;
-    g2.addNode(0);
-    g2.addNode(1);
-    g2.addNode(2);
-    g2.addNode(3);
-    g2.addNode(4);
+    // Graph g2;
+    // g2.addNode(0);
+    // g2.addNode(1);
+    // g2.addNode(2);
+    // g2.addNode(3);
+    // g2.addNode(4);
 
-    g2.Nodes[0].addEdgeByIndex(1,2,g2);
-    g2.Nodes[0].addEdgeByIndex(2,5,g2);
-    g2.Nodes[0].addEdgeByIndex(4,3,g2);
+    // g2.Nodes[0].addEdgeByIndex(1,2,g2);
+    // g2.Nodes[0].addEdgeByIndex(2,5,g2);
+    // g2.Nodes[0].addEdgeByIndex(4,3,g2);
 
-    g2.Nodes[1].addEdgeByIndex(2,6,g2);
-    g2.Nodes[1].addEdgeByIndex(4,10,g2);
-    g2.Nodes[1].addEdgeByIndex(3,4,g2);
+    // g2.Nodes[1].addEdgeByIndex(2,6,g2);
+    // g2.Nodes[1].addEdgeByIndex(4,10,g2);
+    // g2.Nodes[1].addEdgeByIndex(3,4,g2);
 
-    g2.Nodes[2].addEdgeByIndex(4,2,g2);
-    g2.Nodes[2].addEdgeByIndex(3,6,g2);
+    // g2.Nodes[2].addEdgeByIndex(4,2,g2);
+    // g2.Nodes[2].addEdgeByIndex(3,6,g2);
 
-    g2.Nodes[4].addEdgeByIndex(2,1,g2);
-    g2.Nodes[4].addEdgeByIndex(3,2,g2);
+    // g2.Nodes[4].addEdgeByIndex(2,1,g2);
+    // g2.Nodes[4].addEdgeByIndex(3,2,g2);
 
-    g2.shortestPathFixedNode(0);
+    // g2.shortestPathFixedNode(0);
+    //g2.AllPairShortestPath();
     //cout<<INT_MAX;
+    // cout << g2.isCyclic();
+
+    Graph g2;
+    g2.addNode(0,200);
+    g2.addNode(1,400);
+    g2.addNode(2,600);
+    g2.addNode(3,800);
+    cout << g2.Nodes[0].data;
+
+    g2.Nodes[0].addEdgeByIndex(1,10,g2);
+    g2.Nodes[0].addEdgeByIndex(2,5,g2);
+    g2.Nodes[1].addEdgeByIndex(3,2,g2);
+    g2.Nodes[2].addEdgeByIndex(3,1,g2);
+    g2.Nodes[0].addEdgeByIndex(3,4,g2);
+
+    cout << g2.isCyclic();
+
+    g2.breadthFirstSearch(0,800);
+    g2.dfsSearchWrap(400);
+    g2.allPathsBetweenPairOfNodes(0,3);
 
 
 
