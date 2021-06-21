@@ -124,6 +124,59 @@ bool Data::deleteEdgeByIndex(int Giveindex)
     return false;
 }
 
+
+void Data::addData()
+{
+    int flag = 0;
+    int hobbyflag = 0;
+    string EdInstitute;
+    string tempHobby;
+    date temp1(0,0,0);
+    date temp2(0,0,0);
+    cout << "Enter Your First Name - " << endl;
+    cin >> this->fname;
+    cout << "Enter Your Last Name - " << endl;
+    cin >> this->lname;
+    cout << "Enter Your ID Number / Identification Serial Code - " << endl;
+    cin >> this->idNum;
+    cout << "Enter the Educational Details - " << endl;
+    cout << "Press 1 to Stop" << endl;
+    while(flag == 0)
+    {
+        cout << "Enter Name Of the Institution - " << endl;
+        cin.ignore();
+        getline(cin,EdInstitute);
+        cout << "Enter Start Date - " << endl;
+        temp1.setDate();
+        cout << "Enter End Date - " << endl;
+        cout << "If currently Studying Enter Expected Completion Date - " << endl;
+        while(!temp2.checkGreater(temp1))
+        {
+            cout << "Enter a Later date than the strat date" << endl;
+            temp2.setDate();
+        }
+        this->EducationList.push_back(educatinalInstitute(EdInstitute,temp1,temp2));
+        temp1.setDateDefault();
+        temp2.setDateDefault();
+
+        cout << "Enter 1 to Stop OR 0 to Add More Institutions" << endl;
+        cin >> flag;
+    }
+
+
+    cout << "Enter Your hobbies - " << endl;
+
+    while(hobbyflag == 0)
+    {
+        cout << "Enter Hobby - " << endl;
+        cin >> tempHobby;
+        this->hobbies.push_back(tempHobby);
+        cout << "Enter 1 to stop entering hobbies | 0 to enter more hobbies - " << endl;
+        cin >> hobbyflag;
+    }
+
+}
+
 /*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
 
 Graph::Graph()
@@ -870,12 +923,12 @@ void date::setDate()
     }
 
     flag = 0;
-    cout << "Enter Year (1900 - 2021) - " << endl;
+    cout << "Enter Year (1900 - 2030) - " << endl;
 
     while( !flag )
     {
         cin >> this->year;
-        if(this->year < 1900 || this->year > 2021)
+        if(this->year < 1900 || this->year > 2030)
         {
             cout << "Enter a valid Year - " << endl;
         }
@@ -886,6 +939,32 @@ void date::setDate()
     }
 }
 
+void date::setDateDefault()
+{
+    this->day = 0;
+    this->month = 0;
+    this->year = 0;
+}
+
+
+bool date::checkGreater(const date& checkdate)
+{
+    if(this->year > checkdate.year)
+        return true;
+    if(this->year == checkdate.year)
+    {
+        if(this->month > checkdate.month)
+            return true;
+        if(this->month == checkdate.month)
+        {
+            if(this->day > checkdate.day)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 /*--------------------------------------EDUCATIONAL INSTITUTE CLASS MEMBER METHODS-----------------------------------------*/
 educatinalInstitute::educatinalInstitute(string giveInstituteName, date givestartDate, date giveendDate)
@@ -1004,6 +1083,7 @@ int main()
     g2.addNode(2,600);
     g2.addNode(3,800);
     cout << g2.Nodes[0].data;
+    g2.Nodes[2].addData();
 
     g2.Nodes[0].addEdgeByIndex(1,10,g2);
     g2.Nodes[0].addEdgeByIndex(2,5,g2);
@@ -1016,6 +1096,12 @@ int main()
     g2.breadthFirstSearch(0,800);
     g2.dfsSearchWrap(400);
     g2.allPathsBetweenPairOfNodes(0,3);
+    cout << "hi";
+    g2.deleteNodeByIndex(1);
+    cout << g2.Nodes[1].fname << endl;
+    list<educatinalInstitute>:: iterator k;
+    k = g2.Nodes[1].EducationList.begin();
+    cout << k->startDate.day << " " << k->startDate.year;
 
 
 

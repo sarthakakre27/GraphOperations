@@ -2,7 +2,10 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+//forward declarations -->
 class Graph;
+class educatinalInstitute;
+
 int found = 0;
 
 /*-----------------------------------------------------LISTDATA CLASS-------------------------------------------------*/
@@ -24,6 +27,12 @@ public:
     int index;
     int data;
     list<ListData > adjList;
+    //personal data -->
+    string fname;
+    string lname;
+    string idNum;//to be replaced with key
+    list<educatinalInstitute> EducationList;
+    list<string> hobbies;
 
     Data(int Givekey);
     Data(int Givekey,int Givedata);
@@ -32,6 +41,7 @@ public:
     bool addEdgeByIndex(int index,int Giveweight, Graph& g);
     bool deleteEdgeByKey(int Givekey);
     bool deleteEdgeByIndex(int index);
+    void addData();
 };
 
 /*-----------------------------------------------------GRAPH CLASS-------------------------------------------------*/
@@ -70,21 +80,25 @@ public:
 
 class date
 {
-    int day,month,year;
 
 public:
+
+    int day,month,year;
     date(int giveDay = 0,int giveMonth = 0,int giveYear = 0);
     void setDate();
+    void setDateDefault();
+    bool checkGreater(const date& checkdate);
 };
 
 /*----------------------EDUCATIONAL INSTITUTE CLASS---------------------------------------------------*/
 class educatinalInstitute
 {
+public:
     string InstituteName;
     date startDate;
     date endDate;
 
-public:
+
     educatinalInstitute(string giveInstituteName, date givestartDate, date giveendDate);
 
 };
