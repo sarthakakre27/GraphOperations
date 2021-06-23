@@ -77,11 +77,21 @@ public:
     int dfsSearchWrapID(int givekey);
     int dfsSearchID(int Givekey,int index,int* dfsvisited);
     void breadthFirstSearch(int index,int Givedata);
+
+    int breadthFirstSearchIDNum(int GiveIndex,string GiveIDNum);
+
     bool isCyclic();
     bool isCyclicUtil(int index,bool* visited,bool* recStack);
+
+
     void allPathsBetweenPairOfNodes(int index1, int index2);
     void allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,int* path,int& pathIndex);
+
     void findEducationMates(int index);
+
+    void checkConnectionWrap();
+
+    void showCompleteNetwork();
 };
 
 /*-----------------------------------------------------DATE CLASS-------------------------------------------------*/

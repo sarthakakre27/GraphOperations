@@ -659,42 +659,44 @@ bool Graph::shortestPathFixedNode(int Giveindex)
 
 void Graph::AllPairShortestPath()
 {
-    cout << "hi" <<endl;
-    vector<vector<int>> Dist(this->Nodes.size(),vector<int> (this->Nodes.size(),INT_MAX));
-    for(int i = 0; i < this->Nodes.size(); i++)
-    {
-        for(int j = 0; j < this->Nodes.size(); j++)
-        {
-            cout << Dist[i][j] << " ";
-        }
-        cout << endl;
-    }
+    int count = 0;
 
-    //vector<vector<vector<int>>> Path;
-    cout << "hi" <<endl;
+    vector<vector<int>> Dist(this->Nodes.size(),vector<int> (this->Nodes.size(),INT_MAX));
+
+    // for(int i = 0; i < this->Nodes.size(); i++)
+    // {
+    //     for(int j = 0; j < this->Nodes.size(); j++)
+    //     {
+    //         cout << Dist[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+    // cout << "hi" <<endl;
+
+    vector<vector<int>> Next(this->Nodes.size(),vector<int>(this->Nodes.size(),-1));
+
     vector<Data>::iterator it;
     list<ListData>::iterator jt;
+
     for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
     {
-        //cout << "hi" <<endl;
         for(jt = it->adjList.begin(); jt != it->adjList.end(); jt++)
         {
             Dist[it->index][jt->index] = jt->weight;
-            cout << "hi" <<endl;
-            //Path[it->index][jt->index].push_back(1);//first node of the list marked as 1 to show the presence of edge
+
+            if(Dist[it->index][jt->index] != INT_MAX)
+            {
+                Next[it->index][jt->index] = jt->index;
+            }
+            else
+            {
+                Next[it->index][jt->index] = -1;
+            }
         }
     }
 
-    for(int i = 0; i < this->Nodes.size(); i++)
-    {
-        for(int j = 0; j < this->Nodes.size(); j++)
-        {
-            cout << Dist[i][j] << " ";
-        }
-        cout << endl;
-    }
 
-    cout << "hi" <<endl;
+
     for(int k = 0; k < this->Nodes.size(); k++)
     {
         for(int i = 0; i < this->Nodes.size(); i++)
@@ -704,21 +706,43 @@ void Graph::AllPairShortestPath()
                 if(Dist[i][j] > Dist[i][k] + Dist[k][j] && (Dist[k][j] != INT_MAX && Dist[i][k] != INT_MAX))
                 {
                     Dist[i][j] = Dist[i][k] + Dist[k][j];
-                    //Path[i][j].push_back(k);
+                    Next[i][j] = Next[i][k];
                 }
             }
         }
     }
-    cout << "hi" <<endl;
+
+    int max = INT_MIN;
     for(int i = 0; i < this->Nodes.size(); i++)
     {
         for(int j = 0; j < this->Nodes.size(); j++)
         {
-            cout << Dist[i][j] << " ";
+            count = 0;
+            int u = i;
+            int v = j;
+            if(Next[u][v] == -1)
+                continue;
+            while(u != v)
+            {
+                u = Next[u][v];
+                count++;
+            }
+            if(count > max)
+            {
+                max = count;
+            }
         }
-        cout << endl;
     }
+
+    cout << "Max degree of separation is - " << max + 1 << endl;
 }
+
+
+void Graph::MaximumDegreeOfSeparation()
+{
+    this->AllPairShortestPath();
+}
+
 
 
 void Graph::dfsSearchWrap(int Givedata)
@@ -861,6 +885,51 @@ void Graph::breadthFirstSearch(int index,int Givedata)
     }
 }
 
+int Graph::breadthFirstSearchIDNum(int Giveindex,string GiveIDNum)
+{
+    if(Giveindex < 0 || Giveindex > this->Nodes.size())
+    {
+        cout << "invalid index" << endl;
+        return -1;//invalid index
+    }
+
+    bool* visited = new bool[this->Nodes.size()];
+    //memset(visited,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        visited[i] = false;
+    }
+
+    list<int> queue;
+    visited[Giveindex] = true;
+
+    queue.push_back(Giveindex);
+
+    list<ListData>::iterator it;
+    while(!queue.empty())
+    {
+        Giveindex = queue.front();
+        //later appropriate data should be printed
+        if(this->Nodes[Giveindex].idNum == GiveIDNum)
+        {
+            cout << "Found at index - " << Giveindex << endl;
+            return Giveindex;
+        }
+        queue.pop_front();
+
+        for(it = Nodes[Giveindex].adjList.begin(); it != Nodes[Giveindex].adjList.end(); it++)
+        {
+            if(!visited[it->index])
+            {
+                visited[it->index] = true;
+                queue.push_back(it->index);
+            }
+        }
+
+    }
+    return -1;
+}
+
 
 bool Graph::isCyclic()
 {
@@ -944,10 +1013,14 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
 
     if(index1 == index2)
     {
-        cout << "Path - " << endl;
+        cout << "Intermediate Connections From Person1 To Person2 are --> " << endl;
         for(int i = 0; i < pathIndex; i++)
         {
-            cout << path[i] << " ";
+            cout << "------------------------------------------------------------------------" << endl;
+            cout << this->Nodes[path[i]].fname << " " << this->Nodes[path[i]].lname << endl;
+            cout << "IDNUM --> "<< this->Nodes[path[i]].idNum << endl;
+            cout << "------------------------------------------------------------------------" << endl;
+            //cout << path[i] << " ";
         }
         cout << endl;
 
@@ -1055,6 +1128,89 @@ void Graph::findEducationMates(int Giveindex)
             }
         }
 
+    }
+}
+
+//------------------------------------------------------ test ---------------------------------------------------------------------------
+
+void Graph::checkConnectionWrap()
+{
+    if(this->Nodes.size() < 1)
+    {
+        cout << "Network Contains Very Few People. Bye!" <<endl;
+        return;
+    }
+
+    int direct = 0;
+
+    string id1,id2;
+    int index1 = -1,index2 = -1;
+    cout << "Enter the First Person IDNUM to check connection for - " << endl;
+    while(index1 != -1)
+    {
+        cout << "Enter a valid ID - " << endl;
+        cin >> id1;
+        index1 = this->breadthFirstSearchIDNum(0,id1);
+    }
+    
+    cout << "Enter the Second Person IDNUM to check connection for - " << endl;
+    while(index2 != -1)
+    {
+        cout << "Enter a valid ID - " << endl;
+        cin >> id2;
+        index2 = this->breadthFirstSearchIDNum(index1,id2);
+        //searching from the found index to get the person quickly if the are connected
+    }
+
+    if(index1 == index2)
+    {
+        cout << "Great! You Found Same Person! but there's no connection! no self Loops!" << endl;
+        return;
+    }
+
+    list<ListData>::iterator it;
+    for(it = this->Nodes[index1].adjList.begin(); it != this->Nodes[index1].adjList.end(); it++)
+    {
+        if(it->index == index2)
+        {
+            cout << "Person 2 - " << this->Nodes[index2].fname << " " << this->Nodes[index2].lname << endl;
+            cout << "is directly connected to the Person 1" << this->Nodes[index1].fname << " " << this->Nodes[index1].lname << endl;
+            direct = 1;
+        }
+    }
+    if(direct == 0)
+    {
+        cout << "The Person1" << this->Nodes[index1].fname << " " << this->Nodes[index1].lname << "is Not directly connected to" << endl;
+        cout << "Person 2" << this->Nodes[index2].fname << " " << this->Nodes[index2].lname << endl;
+    }
+    
+    this->allPathsBetweenPairOfNodes(index1,index2);
+
+}
+
+//-------------------------------------------------------- test ------------------------------------------------------------
+
+void Graph::showCompleteNetwork()
+{
+    string id1;
+    int index1 = -1;
+    cout << "Enter the Person IDNUM to GET Network for --> " << endl;
+    while(index1 != -1)
+    {
+        cout << "Enter a valid ID - " << endl;
+        cin >> id1;
+        index1 = this->breadthFirstSearchIDNum(0,id1);
+    }
+
+    cout << "The complete NETWORK CONNECTIONS for the given IDNUM are -->" << endl;
+
+    list<ListData>::iterator it;
+    for(it = this->Nodes[index1].adjList.begin(); it != this->Nodes[index1].adjList.end(); it++)
+    {
+        cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - " << endl;
+        cout << this->Nodes[it->index].fname << " " << this->Nodes[it->index].lname << endl;
+        cout << "IDNUM - " << this->Nodes[it->index].idNum << endl;
+        cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - " << endl;
     }
 }
 
