@@ -4,22 +4,22 @@ using namespace std;
 
 
 /*-----------------------------------------LISTDATA MEMBER METHODS--------------------------------------------*/
-ListData::ListData(int Givekey,int Giveweight, int Giveindex)
-    :key(Givekey),index(Giveindex),weight(Giveweight)
+ListData::ListData(int Givekey,int Giveweight, int Giveindex,string GiveIDNum)
+    :key(Givekey),index(Giveindex),weight(Giveweight),idNum(GiveIDNum)
 {
 }
-
 
 /*-----------------------------------------DATA CLASS MEMBER METHODS-----------------------------------------*/
-Data::Data(int Givekey)
+Data::Data(int Givekey, Graph* GiveGref)
+    :Gref(GiveGref),key(Givekey)
 {
-    this->key = Givekey;
+
 }
 
-Data::Data(int Givekey,int Givedata)
+Data::Data(int Givekey,int Givedata, Graph* GiveGref)
+    :Gref(GiveGref),key(Givekey),data(Givedata)
 {
-    this->key = Givekey;
-    this->data = Givedata;
+    
 }
 
 Data::~Data()
@@ -60,7 +60,48 @@ bool Data::addEdgeByKey(int Givekey, int Giveweight, Graph &g)
     }
 
     //else add an edge
-    this->adjList.push_back(ListData(Givekey, Giveweight, d1->index));//found and pushed
+    this->adjList.push_back(ListData(Givekey, Giveweight, d1->index,this->idNum));//found and pushed
+    return true;
+}
+
+bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight,Graph* g)
+{
+    if (this->idNum == GiveIDNum)//avoiding self loops
+    {
+        cout << "Don't connect To YourSelf LOL" << endl;
+        return false;
+    } 
+    vector<Data>::iterator i, d1;
+    //searching for the key
+    for (i = g->Nodes.begin(); i != g->Nodes.end(); i++)
+    {
+        if (i->idNum == GiveIDNum)
+        {
+            d1 = i;
+            break;
+        }
+    }
+    if (d1 == g->Nodes.end())//key not found
+    {
+        cout << "Key Not Found" << endl;
+        return false;
+    }
+
+    //else found -- check for existing edge
+    list<ListData>::iterator it;
+    for(it = g->Nodes[this->index].adjList.begin();it != g->Nodes[this->index].adjList.end(); it++)
+    {
+        if(it->index == d1->index)
+        {
+            cout << "Already Connection exists" << endl;
+            return false;//already exists
+        }
+    }
+
+    //else add an edge
+    this->adjList.push_back(ListData(d1->index, Giveweight, d1->index,this->idNum));//found and pushed
+    //make a reverse connection -- no need of approval on connection
+    g->Nodes[d1->index].adjList.push_back(ListData(this->index,Giveweight,this->index,this->idNum));
     return true;
 }
 
@@ -82,7 +123,7 @@ bool Data::addEdgeByIndex(int Giveindex, int Giveweight, Graph& g)
         }
     }
 
-    g.Nodes[this->index].adjList.push_back(ListData(g.Nodes[Giveindex].key, Giveweight, Giveindex));//not found -- adding the edge
+    g.Nodes[this->index].adjList.push_back(ListData(g.Nodes[Giveindex].key, Giveweight, Giveindex,this->idNum));//not found -- adding the edge
     cout << "Edge Added" << endl;
     return true;
     
@@ -177,6 +218,59 @@ void Data::addData()
 
 }
 
+//--------------------------------------------------- test --------------------------------------------------------------
+
+bool Data::getConnected()
+{
+    int choice = -1;
+    string tempIDNUM;
+    int rating = -1;
+    cout << "Press 1 to get connected via IDNUM | 0 to show List of PEOPLE on the network " << endl;
+    cin >> choice;
+    if(choice == 1)
+    {
+        cout << "PLease Enter the IDNUM to get connected - " << endl;
+        cin >> tempIDNUM;
+        cout << "On a scale of 0-100 how nicely do you know the connection you are making?" << endl;
+        while(rating < 0 || rating > 100)
+        {
+            cout << "Enter a valid rating - " << endl;
+            cin >> rating;
+        }
+        if(this->addEdgeByIDNum(tempIDNUM,100-rating,this->Gref))
+        {
+            cout << "Connection Added" << endl;
+        }
+
+        cout << endl;
+    }
+    else if(choice == 0)//show all the people on the network to whom user can connect
+    {
+        int* dfsvisited = new int[this->Gref->Nodes.size()];
+        for(int i = 0; i < this->Gref->Nodes.size(); i++)
+        {
+            dfsvisited[i] = false;
+        }
+        list<ListData>::iterator tr;
+        for(tr = this->adjList.begin(); tr != this->adjList.end(); tr++)
+        {
+            dfsvisited[tr->index] = true;
+        }
+
+        for(auto it:this->Gref->Nodes)
+        {
+            if( !dfsvisited[it.index] )
+            {
+                this->Gref->dfsTraversalForAddEdge(it.index,dfsvisited);
+            }
+        }
+    }
+    else
+    {
+        cout << "Invalid Choice" << endl;
+    }
+}
+
 /*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
 
 Graph::Graph()
@@ -203,7 +297,7 @@ bool Graph::addNode(int Givekey,int Givedata)
         }
     }
     //else push the node
-    Nodes.push_back(Data(Givekey,Givedata));
+    Nodes.push_back(Data(Givekey,Givedata,this));
     Nodes[this->Nodes.size() - 1].index = this->Nodes.size() - 1;
     return true;
 }
@@ -367,6 +461,30 @@ void Graph::dfsTraversal(int index,int* dfsvisited)
         }
     }
 }
+
+//------------------------------------------ testing ----------------------------------------------------
+
+void Graph::dfsTraversalForAddEdge(int Giveindex,int* dfsvisited)
+{
+    dfsvisited[Giveindex] = true;
+    //cout << "visiting node no." << index <<" ";
+
+    cout <<"-------------------------------------------------" << endl;
+    cout << this->Nodes[Giveindex].fname << " " << this->Nodes[Giveindex].lname << endl;
+    cout << "IDNUMBER - " << this->Nodes[Giveindex].idNum << endl;
+    cout << "------------------------------------------------" << endl;
+
+    list<ListData>::iterator it;
+    for(it = this->Nodes[Giveindex].adjList.begin(); it != this->Nodes[Giveindex].adjList.end(); it++)
+    {
+        if( !dfsvisited[it->index])
+        {
+            this->dfsTraversalForAddEdge(it->index,dfsvisited);
+        }
+    }
+}
+
+
 
 bool Graph::topologicalSort()
 {
@@ -701,7 +819,7 @@ int Graph::dfsSearchID(int Givekey,int index,int* dfsvisited)
 
 void Graph::breadthFirstSearch(int index,int Givedata)
 {
-    if(index < 0 || index > sizeof(this->Nodes))
+    if(index < 0 || index > this->Nodes.size())
     {
         cout << "invalid index" << endl;
         return;//invalid index
@@ -880,6 +998,64 @@ void Graph::addEdge(int selfkey,int tokey)
 
     //both ids are found so add the edge
     this->Nodes[selfindex].addEdgeByIndex(toindex,100 - wt,*this);
+}
+
+
+void Graph::findEducationMates(int Giveindex)
+{
+    if(Giveindex < 0 || Giveindex > this->Nodes.size())
+    {
+        cout << "invalid index" << endl;
+        return;//invalid index
+    }
+    int fixedindex = Giveindex;
+
+    bool* visited = new bool[this->Nodes.size()];
+    //memset(visited,false,this->Nodes.size()*sizeof(bool));
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        visited[i] = false;
+    }
+
+    list<int> queue;
+    visited[Giveindex] = true;
+
+    queue.push_back(Giveindex);
+
+    list<ListData>::iterator it;
+    while(!queue.empty())
+    {
+        Giveindex = queue.front();
+        //later appropriate data should be printed
+        if(Giveindex != fixedindex)
+        {
+            list<educatinalInstitute>::iterator edptr1,edptr2;
+            for(edptr1 = this->Nodes[Giveindex].EducationList.begin(); edptr1 != this->Nodes[Giveindex].EducationList.end(); edptr1++)
+            {
+                for(edptr2 = this->Nodes[fixedindex].EducationList.begin(); edptr2 != this->Nodes[fixedindex].EducationList.end(); edptr2++)
+                {
+                    if(edptr1->InstituteName == edptr2->InstituteName)
+                    {
+                        cout << "You may know - " << this->Nodes[Giveindex].fname << " " << this->Nodes[Giveindex].lname << endl;
+                        cout << "From - " << edptr1->InstituteName << " as you were in same Educational Institute" << endl;
+                        cout << "\n" << endl;
+                    }
+                }
+                
+            }
+        }
+        queue.pop_front();
+
+        for(it = Nodes[Giveindex].adjList.begin(); it != Nodes[Giveindex].adjList.end(); it++)
+        {
+            if(!visited[it->index])
+            {
+                visited[it->index] = true;
+                queue.push_back(it->index);
+            }
+        }
+
+    }
 }
 
 /*------------------------------------------------DATE CLASS MEMBER METHODS-----------------------------------------------*/
@@ -1077,30 +1253,30 @@ int main()
     //cout<<INT_MAX;
     // cout << g2.isCyclic();
 
-    Graph g2;
-    g2.addNode(0,200);
-    g2.addNode(1,400);
-    g2.addNode(2,600);
-    g2.addNode(3,800);
-    cout << g2.Nodes[0].data;
-    g2.Nodes[2].addData();
+    Graph g1;
+    g1.addNode(0,200);
+    g1.addNode(1,400);
+    g1.addNode(2,600);
+    g1.addNode(3,800);
+    cout << g1.Nodes[0].data;
+    g1.Nodes[2].addData();
 
-    g2.Nodes[0].addEdgeByIndex(1,10,g2);
-    g2.Nodes[0].addEdgeByIndex(2,5,g2);
-    g2.Nodes[1].addEdgeByIndex(3,2,g2);
-    g2.Nodes[2].addEdgeByIndex(3,1,g2);
+    g1.Nodes[0].addEdgeByIndex(1,10,g1);
+    g1.Nodes[0].addEdgeByIndex(2,5,g1);
+    g1.Nodes[1].addEdgeByIndex(3,2,g1);
+    g1.Nodes[2].addEdgeByIndex(3,1,g1);
     //g2.Nodes[0].addEdgeByIndex(3,4,g2);
-    g2.addEdge(0,3);
-    cout << g2.isCyclic();
+    g1.addEdge(0,3);
+    cout << g1.isCyclic();
 
-    g2.breadthFirstSearch(0,800);
-    g2.dfsSearchWrap(400);
-    g2.allPathsBetweenPairOfNodes(0,3);
+    g1.breadthFirstSearch(0,800);
+    g1.dfsSearchWrap(400);
+    g1.allPathsBetweenPairOfNodes(0,3);
     cout << "hi";
-    g2.deleteNodeByIndex(1);
-    cout << g2.Nodes[1].fname << endl;
+    g1.deleteNodeByIndex(1);
+    cout << g1.Nodes[1].fname << endl;
     list<educatinalInstitute>:: iterator k;
-    k = g2.Nodes[1].EducationList.begin();
+    k = g1.Nodes[1].EducationList.begin();
     cout << k->startDate.day << " " << k->startDate.year;
 
 

@@ -12,10 +12,11 @@ int found = 0;
 class ListData
 {
 public:
+    string idNum;
     int key;
     int index;
     int weight;
-    ListData(int key, int Giveweight,int index);
+    ListData(int key, int Giveweight,int index,string GiveIDNum);
 };
 
 
@@ -26,6 +27,7 @@ public:
     int key;
     int index;
     int data;
+    Graph* Gref;
     list<ListData > adjList;
     //personal data -->
     string fname;
@@ -34,14 +36,17 @@ public:
     list<educatinalInstitute> EducationList;
     list<string> hobbies;
 
-    Data(int Givekey);
-    Data(int Givekey,int Givedata);
+    Data(int Givekey, Graph* GiveGref);
+    Data(int Givekey,int Givedata,Graph* GiveGref);
     ~Data();
     bool addEdgeByKey(int key,int Giveweight, Graph &g);
+    bool addEdgeByIDNum(string key,int Giveweight, Graph *g);
+
     bool addEdgeByIndex(int index,int Giveweight, Graph& g);
     bool deleteEdgeByKey(int Givekey);
     bool deleteEdgeByIndex(int index);
     void addData();
+    bool getConnected();
 };
 
 /*-----------------------------------------------------GRAPH CLASS-------------------------------------------------*/
@@ -61,6 +66,8 @@ public:
     void breadthFirstTraversal(int index);
     void dfsTraversalWrap();
     void dfsTraversal(int index,int* dfsvisited);
+    //void dfsTraversalForAddEdgeWrap();
+    void dfsTraversalForAddEdge(int index,int* dfsvisited);
     bool topologicalSort();
     void MSTprims();
     bool shortestPathFixedNode(int Giveindex);
@@ -74,6 +81,7 @@ public:
     bool isCyclicUtil(int index,bool* visited,bool* recStack);
     void allPathsBetweenPairOfNodes(int index1, int index2);
     void allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,int* path,int& pathIndex);
+    void findEducationMates(int index);
 };
 
 /*-----------------------------------------------------DATE CLASS-------------------------------------------------*/
