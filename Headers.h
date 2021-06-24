@@ -47,6 +47,8 @@ public:
     bool deleteEdgeByIndex(int index);
     void addData();
     bool getConnected();
+
+    void listLatestConnectionsForMyNetwork();
 };
 
 /*-----------------------------------------------------GRAPH CLASS-------------------------------------------------*/
@@ -61,6 +63,9 @@ public:
     ~Graph();
     bool addNode(int Givekey,int Givedata);
     bool deleteNodeByKey(int Givekey);
+
+    bool deleteNodeByKey(string Givekey);
+
     bool deleteNodeByIndex(int index);
     void addEdge(int selfkey,int tokey);
     void breadthFirstTraversal(int index);
@@ -92,6 +97,10 @@ public:
     void checkConnectionWrap();
 
     void showCompleteNetwork();
+    
+    void MaximumDegreeOfSeparation();
+
+    void listPotentialGroupsOnHobbies();
 };
 
 /*-----------------------------------------------------DATE CLASS-------------------------------------------------*/

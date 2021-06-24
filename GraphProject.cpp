@@ -271,6 +271,40 @@ bool Data::getConnected()
     }
 }
 
+
+void Data::listLatestConnectionsForMyNetwork()
+{
+    int i;
+    cout << "-------------------------------------------------------------------------------" << endl;
+    cout << " - Showing Latest Connections That Were Make By Your Contacts/Connections - " << endl;
+    cout << "-------------------------------------------------------------------------------" << endl;
+
+    list<ListData>::iterator it,jt;
+    for(it = this->adjList.begin(); it != this->adjList.end(); it++)
+    {
+        cout << "-------------------------------------------------------------------------------" << endl;
+        cout << "Your Connection - " << this->Gref->Nodes[it->index].fname << " " << this->Gref->Nodes[it->index].lname << endl;
+        cout << "Had latest connections --> " << endl;
+
+        //int size = this->Gref->Nodes[it->index].adjList.size();
+        jt = this->Gref->Nodes[it->index].adjList.end();
+        i = 0;
+        while(jt != this->Gref->Nodes[it->index].adjList.begin() and i < 3)
+        {
+            jt--;
+            i++;
+        }
+
+        for(;jt != this->Gref->Nodes[it->index].adjList.end(); jt++)
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            cout << this->Gref->Nodes[jt->index].fname << " " << this->Gref->Nodes[jt->index].lname << endl;
+            cout << this->Gref->Nodes[jt->index].idNum << endl;
+            cout << "-------------------------------------------------------------------------------" << endl;
+        }
+    }
+}
+
 /*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
 
 Graph::Graph()
@@ -309,6 +343,54 @@ bool Graph::deleteNodeByKey(int Givekey)
     for (i = this->Nodes.begin(); i != this->Nodes.end(); i++)
     {
         if (i->key == Givekey)
+        {
+            break;
+        }
+    
+    }
+    if (i != this->Nodes.end())//found index in the node vector
+    {
+        int Foundindex = i->index;
+        vector<Data>::iterator vecIt;
+        for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
+        {
+            list<ListData>::iterator lIt,eraseptr;
+            found = 0;
+            for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
+            {
+                if(lIt->index > Foundindex)
+                {
+                    lIt->index--;
+                }
+                else if(lIt->index == Foundindex)
+                {
+                    eraseptr = lIt;
+                    found = 1;
+                    //erase the incoming pointers to the node to be deleted
+                }
+            }
+            if(found == 1)
+                vecIt->adjList.erase(eraseptr);
+        }
+        //after erasing the the incoming pointers erase the node
+        this->Nodes.erase(i);
+        for (int i = Foundindex; i < this->Nodes.size(); i++)
+        {
+            this->Nodes[i].index = i;
+        }
+        return true;
+    }
+    return false;//key not found
+}
+
+
+bool Graph::deleteNodeByKey(string Givekey)
+{
+    int found = 0;
+    vector<Data>::iterator i;
+    for (i = this->Nodes.begin(); i != this->Nodes.end(); i++)
+    {
+        if (i->idNum == Givekey)
         {
             break;
         }
@@ -1211,6 +1293,39 @@ void Graph::showCompleteNetwork()
         cout << this->Nodes[it->index].fname << " " << this->Nodes[it->index].lname << endl;
         cout << "IDNUM - " << this->Nodes[it->index].idNum << endl;
         cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - " << endl;
+    }
+}
+
+
+void Graph::listPotentialGroupsOnHobbies()
+{
+    unordered_map<string,list<int>> hbyMap;
+
+    vector<Data>::iterator it;
+    list<string>::iterator jt;
+    list<int>::iterator ptr;
+
+    for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
+    {
+        for(jt = it->hobbies.begin(); jt != it->hobbies.end(); jt++)
+        {
+            hbyMap[*jt].push_back(it->index);
+        }
+    }
+    cout << "-------------------------------------------------------------------------------" << endl;
+    cout << "----------------------------POTENTIAL HOBBY GROUPS-----------------------------" << endl;
+    unordered_map<string,list<int>>::iterator i;
+    for(i = hbyMap.begin(); i != hbyMap.end(); i++)
+    {
+        cout << "-------------------------------------------------------------------------------" << endl;
+        cout << "---------------------------------Hobby " << i->first <<"-----------------------" << endl;
+        for(ptr = i->second.begin(); ptr != i->second.end(); ptr++)
+        {
+            cout << "-------------------------------------------------------------------------------" << endl;
+            cout << this->Nodes[*ptr].fname << " " << this->Nodes[*ptr].lname << endl;
+            cout << this->Nodes[*ptr].idNum << endl;
+            cout << "-------------------------------------------------------------------------------" << endl;
+        }
     }
 }
 
