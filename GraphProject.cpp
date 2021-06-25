@@ -4,30 +4,32 @@ using namespace std;
 
 
 /*-----------------------------------------LISTDATA MEMBER METHODS--------------------------------------------*/
-ListData::ListData(int Givekey,int Giveweight, int Giveindex,string GiveIDNum)
-    :key(Givekey),index(Giveindex),weight(Giveweight),idNum(GiveIDNum)
+ListData::ListData(string GiveIDNum,int Giveweight, int Giveindex)
+    :idNum(GiveIDNum),index(Giveindex),weight(Giveweight)
 {
 }
 
 /*-----------------------------------------DATA CLASS MEMBER METHODS-----------------------------------------*/
-Data::Data(int Givekey, Graph* GiveGref)
-    :Gref(GiveGref),key(Givekey)
+Data::Data(string Givekey, Graph* GiveGref)
+    :Gref(GiveGref),idNum(Givekey)//,key(Givekey)
 {
 
 }
 
-Data::Data(int Givekey,int Givedata, Graph* GiveGref)
-    :Gref(GiveGref),key(Givekey),data(Givedata)
+/*
+Data::Data(string Givekey,int Givedata, Graph* GiveGref)  //
+    :Gref(GiveGref),data(Givedata),idNum(Givekey)//,key(Givekey)
 {
     
 }
+*/
 
 Data::~Data()
 {
     this->adjList.clear();
 }
 
-
+/*
 bool Data::addEdgeByKey(int Givekey, int Giveweight, Graph &g)
 {
     if (this->key == Givekey) //avoiding self loops
@@ -63,8 +65,9 @@ bool Data::addEdgeByKey(int Givekey, int Giveweight, Graph &g)
     this->adjList.push_back(ListData(Givekey, Giveweight, d1->index,this->idNum));//found and pushed
     return true;
 }
+*/
 
-bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight,Graph* g)
+bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight)
 {
     if (this->idNum == GiveIDNum)//avoiding self loops
     {
@@ -73,7 +76,7 @@ bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight,Graph* g)
     } 
     vector<Data>::iterator i, d1;
     //searching for the key
-    for (i = g->Nodes.begin(); i != g->Nodes.end(); i++)
+    for (i = this->Gref->Nodes.begin(); i != this->Gref->Nodes.end(); i++)
     {
         if (i->idNum == GiveIDNum)
         {
@@ -81,7 +84,7 @@ bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight,Graph* g)
             break;
         }
     }
-    if (d1 == g->Nodes.end())//key not found
+    if (d1 == this->Gref->Nodes.end())//key not found
     {
         cout << "Key Not Found" << endl;
         return false;
@@ -89,7 +92,7 @@ bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight,Graph* g)
 
     //else found -- check for existing edge
     list<ListData>::iterator it;
-    for(it = g->Nodes[this->index].adjList.begin();it != g->Nodes[this->index].adjList.end(); it++)
+    for(it = this->Gref->Nodes[this->index].adjList.begin();it != this->Gref->Nodes[this->index].adjList.end(); it++)
     {
         if(it->index == d1->index)
         {
@@ -99,9 +102,9 @@ bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight,Graph* g)
     }
 
     //else add an edge
-    this->adjList.push_back(ListData(d1->index, Giveweight, d1->index,this->idNum));//found and pushed
+    this->adjList.push_back(ListData(this->idNum, Giveweight, d1->index));//found and pushed
     //make a reverse connection -- no need of approval on connection
-    g->Nodes[d1->index].adjList.push_back(ListData(this->index,Giveweight,this->index,this->idNum));
+    this->Gref->Nodes[d1->index].adjList.push_back(ListData(this->idNum,Giveweight,this->index));
     return true;
 }
 
@@ -123,18 +126,18 @@ bool Data::addEdgeByIndex(int Giveindex, int Giveweight, Graph& g)
         }
     }
 
-    g.Nodes[this->index].adjList.push_back(ListData(g.Nodes[Giveindex].key, Giveweight, Giveindex,this->idNum));//not found -- adding the edge
+    g.Nodes[this->index].adjList.push_back(ListData(this->idNum, Giveweight, Giveindex));//not found -- adding the edge
     cout << "Edge Added" << endl;
     return true;
     
 }
 
-bool Data::deleteEdgeByKey(int Givekey)
+bool Data::deleteEdgeByKey(string Givekey)
 {
     list<ListData>::iterator it;
     for(it = this->adjList.begin(); it != this->adjList.end(); it++)//search for the key
     {
-        if(it->key == Givekey)//key found
+        if(it->idNum == Givekey)//key found
         {
             break;
         }
@@ -166,7 +169,7 @@ bool Data::deleteEdgeByIndex(int Giveindex)
 }
 
 
-void Data::addData()
+void Data::addData(string Givekey)
 {
     int flag = 0;
     int hobbyflag = 0;
@@ -178,8 +181,9 @@ void Data::addData()
     cin >> this->fname;
     cout << "Enter Your Last Name - " << endl;
     cin >> this->lname;
-    cout << "Enter Your ID Number / Identification Serial Code - " << endl;
-    cin >> this->idNum;
+    // cout << "Enter Your ID Number / Identification Serial Code - " << endl;
+    // cin >> this->idNum;
+    this->idNum = Givekey;
     cout << "Enter the Educational Details - " << endl;
     cout << "Press 1 to Stop" << endl;
     while(flag == 0)
@@ -193,7 +197,7 @@ void Data::addData()
         cout << "If currently Studying Enter Expected Completion Date - " << endl;
         while(!temp2.checkGreater(temp1))
         {
-            cout << "Enter a Later date than the strat date" << endl;
+            cout << "Enter a Later date than the start date" << endl;
             temp2.setDate();
         }
         this->EducationList.push_back(educatinalInstitute(EdInstitute,temp1,temp2));
@@ -225,49 +229,58 @@ bool Data::getConnected()
     int choice = -1;
     string tempIDNUM;
     int rating = -1;
-    cout << "Press 1 to get connected via IDNUM | 0 to show List of PEOPLE on the network " << endl;
-    cin >> choice;
-    if(choice == 1)
+    while(choice != 2)
     {
-        cout << "PLease Enter the IDNUM to get connected - " << endl;
-        cin >> tempIDNUM;
-        cout << "On a scale of 0-100 how nicely do you know the connection you are making?" << endl;
-        while(rating < 0 || rating > 100)
+        cout << "Press 1 to get connected via IDNUM | 0 to show List of PEOPLE on the network | 2 to exit" << endl;
+        cin >> choice;
+        if(choice == 1)
         {
-            cout << "Enter a valid rating - " << endl;
-            cin >> rating;
-        }
-        if(this->addEdgeByIDNum(tempIDNUM,100-rating,this->Gref))
-        {
-            cout << "Connection Added" << endl;
-        }
-
-        cout << endl;
-    }
-    else if(choice == 0)//show all the people on the network to whom user can connect
-    {
-        int* dfsvisited = new int[this->Gref->Nodes.size()];
-        for(int i = 0; i < this->Gref->Nodes.size(); i++)
-        {
-            dfsvisited[i] = false;
-        }
-        list<ListData>::iterator tr;
-        for(tr = this->adjList.begin(); tr != this->adjList.end(); tr++)
-        {
-            dfsvisited[tr->index] = true;
-        }
-
-        for(auto it:this->Gref->Nodes)
-        {
-            if( !dfsvisited[it.index] )
+            cout << "PLease Enter the IDNUM to get connected - " << endl;
+            cin >> tempIDNUM;
+            cout << "On a scale of 0-100 how nicely do you know the connection you are making?" << endl;
+            rating = -1;
+            while(rating < 0 || rating > 100)
             {
-                this->Gref->dfsTraversalForAddEdge(it.index,dfsvisited);
+                cout << "Enter a valid rating - " << endl;
+                cin >> rating;
+            }
+            if(this->addEdgeByIDNum(tempIDNUM,100-rating))
+            {
+                cout << "Connection Added" << endl;
+            }
+
+            cout << endl;
+        }
+        else if(choice == 0)//show all the people on the network to whom user can connect
+        {
+            int* dfsvisited = new int[this->Gref->Nodes.size()];
+            for(int i = 0; i < this->Gref->Nodes.size(); i++)
+            {
+                dfsvisited[i] = false;
+            }
+            list<ListData>::iterator tr;
+            for(tr = this->adjList.begin(); tr != this->adjList.end(); tr++)
+            {
+                dfsvisited[tr->index] = true;
+            }
+            dfsvisited[this->index] = true;
+
+            for(auto it:this->Gref->Nodes)
+            {
+                if( !dfsvisited[it.index] )
+                {
+                    this->Gref->dfsTraversalForAddEdge(it.index,dfsvisited);
+                }
             }
         }
-    }
-    else
-    {
-        cout << "Invalid Choice" << endl;
+        else if(choice == 2)
+        {
+
+        }
+        else
+        {
+            cout << "Invalid Choice" << endl;
+        }
     }
 }
 
@@ -305,6 +318,12 @@ void Data::listLatestConnectionsForMyNetwork()
     }
 }
 
+
+void Data::findEducationMates()
+{
+    this->Gref->findEducationMates(this->index);
+}
+
 /*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
 
 Graph::Graph()
@@ -319,23 +338,51 @@ Graph::~Graph()
     }
 }
 
-bool Graph::addNode(int Givekey,int Givedata)
+void Graph::addNodeWrap()
+{
+    string tempID;
+    cout << "Please Enter Your IDNUMBER - " << endl;
+    cin >> tempID;
+    int findInd = -1;
+    if(this->Nodes.size() > 0)
+    {
+        findInd = this->dfsSearchWrapID(tempID);
+        if(findInd != -1)
+        {
+            cout << "Entry with this ID already Exists!" << endl;
+            return;
+        }
+        else
+        {
+            this->addNode(tempID);
+        }
+    }
+    else
+    {
+        this->addNode(tempID);
+    }
+}
+
+bool Graph::addNode(string Givekey)
 {
     vector<Data>::iterator it;
+    //check for Not coming through wrapper
     for(it = this->Nodes.begin(); it != this->Nodes.end(); it++)
     {
-        if(it->key == Givekey)
+        if(it->idNum == Givekey)
         {
             cout<<"Already Exists"<<endl;
             return false;
         }
     }
     //else push the node
-    Nodes.push_back(Data(Givekey,Givedata,this));
-    Nodes[this->Nodes.size() - 1].index = this->Nodes.size() - 1;
+    this->Nodes.push_back(Data(Givekey,this));
+    this->Nodes[this->Nodes.size() - 1].index = this->Nodes.size() - 1;
+    this->Nodes[this->Nodes.size() - 1].addData(Givekey);
     return true;
 }
 
+/*
 bool Graph::deleteNodeByKey(int Givekey)
 {
     int found = 0;
@@ -382,6 +429,7 @@ bool Graph::deleteNodeByKey(int Givekey)
     }
     return false;//key not found
 }
+*/
 
 
 bool Graph::deleteNodeByKey(string Givekey)
@@ -827,7 +875,7 @@ void Graph::MaximumDegreeOfSeparation()
 
 
 
-void Graph::dfsSearchWrap(int Givedata)
+void Graph::dfsSearchWrap(string Givekey)
 {
     int* dfsvisited = new int[this->Nodes.size()];
     //memset(dfsvisited,false,this->Nodes.size()*sizeof(int));
@@ -843,16 +891,16 @@ void Graph::dfsSearchWrap(int Givedata)
     {
         if( !dfsvisited[it->index] )
         {
-            this->dfsSearch(Givedata,it->index,dfsvisited);
+            this->dfsSearch(Givekey,it->index,dfsvisited);
         }
     }
 
 }
 
-void Graph::dfsSearch(int Givedata,int index,int* dfsvisited)
+void Graph::dfsSearch(string Givekey,int index,int* dfsvisited)
 {   
     dfsvisited[index] = true;
-    if(this->Nodes[index].data == Givedata)
+    if(this->Nodes[index].idNum == Givekey)
     {
         cout << "Data found At Index - " << index << endl;
         found = 1;
@@ -864,7 +912,7 @@ void Graph::dfsSearch(int Givedata,int index,int* dfsvisited)
     {
         if( !dfsvisited[it->index])
         {
-            this->dfsSearch(Givedata,it->index,dfsvisited);
+            this->dfsSearch(Givekey,it->index,dfsvisited);
             if(found == 1)
                 return;
         }
@@ -872,7 +920,7 @@ void Graph::dfsSearch(int Givedata,int index,int* dfsvisited)
 }
 
 
-int Graph::dfsSearchWrapID(int Givekey)
+int Graph::dfsSearchWrapID(string Givekey)
 {
     int ret_val = -1;
     int* dfsvisited = new int[this->Nodes.size()];
@@ -899,11 +947,11 @@ int Graph::dfsSearchWrapID(int Givekey)
 
 }
 
-int Graph::dfsSearchID(int Givekey,int index,int* dfsvisited)
+int Graph::dfsSearchID(string Givekey,int index,int* dfsvisited)
 {   
     int ret_val = -1;
     dfsvisited[index] = true;
-    if(this->Nodes[index].key == Givekey)
+    if(this->Nodes[index].idNum == Givekey)
     {
         cout << "Data found At Index - " << index << endl;
         found = 1;
@@ -923,7 +971,7 @@ int Graph::dfsSearchID(int Givekey,int index,int* dfsvisited)
     return -1;
 }
 
-void Graph::breadthFirstSearch(int index,int Givedata)
+void Graph::breadthFirstSearch(int index,string Givekey)
 {
     if(index < 0 || index > this->Nodes.size())
     {
@@ -948,7 +996,7 @@ void Graph::breadthFirstSearch(int index,int Givedata)
     {
         index = queue.front();
         //later appropriate data should be printed
-        if(this->Nodes[index].data == Givedata)
+        if(this->Nodes[index].idNum == Givekey)
         {
             cout << "Found at index - " << index << endl;
             break;
@@ -1096,7 +1144,7 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
     if(index1 == index2)
     {
         cout << "Intermediate Connections From Person1 To Person2 are --> " << endl;
-        for(int i = 0; i < pathIndex; i++)
+        for(int i = 1; i < pathIndex - 1; i++)
         {
             cout << "------------------------------------------------------------------------" << endl;
             cout << this->Nodes[path[i]].fname << " " << this->Nodes[path[i]].lname << endl;
@@ -1123,7 +1171,7 @@ void Graph::allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,
     visited[index1] = false;
 }
 
-void Graph::addEdge(int selfkey,int tokey)
+void Graph::addEdge(string selfkey,string tokey)
 {
     cout << "hi" << endl;
     int selfindex = dfsSearchWrapID(selfkey);
@@ -1142,10 +1190,10 @@ void Graph::addEdge(int selfkey,int tokey)
     }
     int wt = -1;//weight for the edge //for the application it is the factor that
     //how much the person the connection is made to is familiar to him/her
-    cout << "hi2" << endl;
+    //cout << "hi2" << endl;
     while(wt < 0 || wt > 101)
     {
-        cout << "hi3" << endl;
+        //cout << "hi3" << endl;
         cout << "How nicely Do you know the person you are connecting...on a scale of 0 - 100" << endl;
         cout << "0 - least | 100 - most" << endl;
         cin  >> wt;
@@ -1228,17 +1276,21 @@ void Graph::checkConnectionWrap()
     string id1,id2;
     int index1 = -1,index2 = -1;
     cout << "Enter the First Person IDNUM to check connection for - " << endl;
-    while(index1 != -1)
+    while(index1 == -1)
     {
         cout << "Enter a valid ID - " << endl;
+        cin.ignore(numeric_limits<streamsize>::max(),'\n');
+        fflush(stdin);
         cin >> id1;
         index1 = this->breadthFirstSearchIDNum(0,id1);
     }
     
     cout << "Enter the Second Person IDNUM to check connection for - " << endl;
-    while(index2 != -1)
+    while(index2 == -1)
     {
         cout << "Enter a valid ID - " << endl;
+        cin.ignore(numeric_limits<streamsize>::max(),'\n');
+        fflush(stdin);
         cin >> id2;
         index2 = this->breadthFirstSearchIDNum(index1,id2);
         //searching from the found index to get the person quickly if the are connected
@@ -1262,7 +1314,7 @@ void Graph::checkConnectionWrap()
     }
     if(direct == 0)
     {
-        cout << "The Person1" << this->Nodes[index1].fname << " " << this->Nodes[index1].lname << "is Not directly connected to" << endl;
+        cout << "The Person 1 " << this->Nodes[index1].fname << " " << this->Nodes[index1].lname << " is Not directly connected to " << endl;
         cout << "Person 2" << this->Nodes[index2].fname << " " << this->Nodes[index2].lname << endl;
     }
     
@@ -1524,33 +1576,70 @@ int main()
     //cout<<INT_MAX;
     // cout << g2.isCyclic();
 
-    Graph g1;
-    g1.addNode(0,200);
-    g1.addNode(1,400);
-    g1.addNode(2,600);
-    g1.addNode(3,800);
-    cout << g1.Nodes[0].data;
-    g1.Nodes[2].addData();
+    // Graph g1;
+    // g1.addNode(0,200);
+    // g1.addNode(1,400);
+    // g1.addNode(2,600);
+    // g1.addNode(3,800);
+    // cout << g1.Nodes[0].data;
+    // g1.Nodes[2].addData();
 
-    g1.Nodes[0].addEdgeByIndex(1,10,g1);
-    g1.Nodes[0].addEdgeByIndex(2,5,g1);
-    g1.Nodes[1].addEdgeByIndex(3,2,g1);
-    g1.Nodes[2].addEdgeByIndex(3,1,g1);
-    //g2.Nodes[0].addEdgeByIndex(3,4,g2);
-    g1.addEdge(0,3);
-    cout << g1.isCyclic();
+    // g1.Nodes[0].addEdgeByIndex(1,10,g1);
+    // g1.Nodes[0].addEdgeByIndex(2,5,g1);
+    // g1.Nodes[1].addEdgeByIndex(3,2,g1);
+    // g1.Nodes[2].addEdgeByIndex(3,1,g1);
+    // //g2.Nodes[0].addEdgeByIndex(3,4,g2);
+    // g1.addEdge(0,3);
+    // cout << g1.isCyclic();
 
-    g1.breadthFirstSearch(0,800);
-    g1.dfsSearchWrap(400);
-    g1.allPathsBetweenPairOfNodes(0,3);
-    cout << "hi";
-    g1.deleteNodeByIndex(1);
-    cout << g1.Nodes[1].fname << endl;
-    list<educatinalInstitute>:: iterator k;
-    k = g1.Nodes[1].EducationList.begin();
-    cout << k->startDate.day << " " << k->startDate.year;
+    // g1.breadthFirstSearch(0,800);
+    // g1.dfsSearchWrap(400);
+    // g1.allPathsBetweenPairOfNodes(0,3);
+    // cout << "hi";
+    // g1.deleteNodeByIndex(1);
+    // cout << g1.Nodes[1].fname << endl;
+    // list<educatinalInstitute>:: iterator k;
+    // k = g1.Nodes[1].EducationList.begin();
+    // cout << k->startDate.day << " " << k->startDate.year;
 
+    Graph g;
+    list<ListData>::iterator it;
+    g.addNodeWrap();
+    g.addNodeWrap();
+    g.addNodeWrap();
+    g.addNodeWrap();
+    cout << g.Nodes[0].fname << endl;
+    cout << g.Nodes[1].fname << endl;
+    cout << g.Nodes[2].fname << endl;
+    cout << g.Nodes[3].fname << endl;
+    g.Nodes[0].getConnected();
+    for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
+    {
+        cout << it->index << " ";
+    }
+    cout << endl;
+    g.Nodes[0].getConnected();
+    for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
+    {
+        cout << it->index << " ";
+    }
+    cout << endl;
+    g.Nodes[2].getConnected();
+    for(it = g.Nodes[2].adjList.begin(); it != g.Nodes[2].adjList.end(); it++)
+    {
+        cout << it->index << " ";
+    }
+    cout << endl;
+    g.Nodes[2].getConnected();
+    for(it = g.Nodes[2].adjList.begin(); it != g.Nodes[2].adjList.end(); it++)
+    {
+        cout << it->index << " ";
+    }
+    cout << endl;
+    g.checkConnectionWrap();
+    g.Nodes[0].findEducationMates();
 
+    //cout << g.Nodes[0].Gref->Nodes[0].fname;
 
 
     return 0;

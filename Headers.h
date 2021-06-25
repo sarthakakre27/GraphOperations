@@ -13,10 +13,10 @@ class ListData
 {
 public:
     string idNum;
-    int key;
+    //int key;
     int index;
     int weight;
-    ListData(int key, int Giveweight,int index,string GiveIDNum);
+    ListData(string GiveIDNum, int Giveweight,int index);
 };
 
 
@@ -24,31 +24,34 @@ public:
 class Data
 {
 public:
-    int key;
+    //int key;
     int index;
-    int data;
+    //int data;
     Graph* Gref;
     list<ListData > adjList;
     //personal data -->
     string fname;
     string lname;
-    string idNum;//to be replaced with key
+    string idNum;
     list<educatinalInstitute> EducationList;
     list<string> hobbies;
 
-    Data(int Givekey, Graph* GiveGref);
-    Data(int Givekey,int Givedata,Graph* GiveGref);
+    Data(string Givekey, Graph* GiveGref);
+    //Data(string Givekey,int Givedata,Graph* GiveGref);
     ~Data();
-    bool addEdgeByKey(int key,int Giveweight, Graph &g);
-    bool addEdgeByIDNum(string key,int Giveweight, Graph *g);
+    //bool addEdgeByKey(int key,int Giveweight, Graph &g);//depriciated
+    bool addEdgeByIDNum(string key,int Giveweight);
 
     bool addEdgeByIndex(int index,int Giveweight, Graph& g);
-    bool deleteEdgeByKey(int Givekey);
+    bool deleteEdgeByKey(string Givekey);
     bool deleteEdgeByIndex(int index);
-    void addData();
+    void addData(string givekey);
     bool getConnected();
 
     void listLatestConnectionsForMyNetwork();
+
+    void findEducationMates();
+
 };
 
 /*-----------------------------------------------------GRAPH CLASS-------------------------------------------------*/
@@ -61,27 +64,43 @@ public:
 
     Graph();
     ~Graph();
-    bool addNode(int Givekey,int Givedata);
-    bool deleteNodeByKey(int Givekey);
+
+    void addNodeWrap();
+
+    bool addNode(string Givekey);
+    //bool deleteNodeByKey(int Givekey);//depriciated
 
     bool deleteNodeByKey(string Givekey);
 
     bool deleteNodeByIndex(int index);
-    void addEdge(int selfkey,int tokey);
+    //change
+    void addEdge(string selfkey,string tokey);
+    //
     void breadthFirstTraversal(int index);
+
     void dfsTraversalWrap();
     void dfsTraversal(int index,int* dfsvisited);
+
     //void dfsTraversalForAddEdgeWrap();
     void dfsTraversalForAddEdge(int index,int* dfsvisited);
+
     bool topologicalSort();
+
     void MSTprims();
+
     bool shortestPathFixedNode(int Giveindex);
+
     void AllPairShortestPath();
-    void dfsSearchWrap(int Givedata);
-    void dfsSearch(int Givedata,int index,int* dfsvisited);
-    int dfsSearchWrapID(int givekey);
-    int dfsSearchID(int Givekey,int index,int* dfsvisited);
-    void breadthFirstSearch(int index,int Givedata);
+
+    void dfsSearchWrap(string Givekey);
+    void dfsSearch(string Givekey,int index,int* dfsvisited);
+
+    //change
+    int dfsSearchWrapID(string givekey);
+    int dfsSearchID(string Givekey,int index,int* dfsvisited);
+    //
+
+    void breadthFirstSearch(int index,string Givekey);
 
     int breadthFirstSearchIDNum(int GiveIndex,string GiveIDNum);
 
