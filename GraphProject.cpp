@@ -324,6 +324,11 @@ void Data::findEducationMates()
     this->Gref->findEducationMates(this->index);
 }
 
+void Data::shortestPathToKnowSomeone()
+{
+    this->Gref->shortestPathFixedNode(this->index);
+}
+
 /*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
 
 Graph::Graph()
@@ -430,6 +435,23 @@ bool Graph::deleteNodeByKey(int Givekey)
     return false;//key not found
 }
 */
+
+
+void Graph::deleteNodeByKeyWrap()
+{
+    string tempid;
+    cout << "Enter the Key to delete the Data" << endl;
+    cin >> tempid;
+    
+    if(this->deleteNodeByKey(tempid))
+    {
+        cout << "Deleted SuccessFully" << endl;
+        return;
+    }
+
+    cout << "ID NOT FOUND" << endl;
+
+}
 
 
 bool Graph::deleteNodeByKey(string Givekey)
@@ -661,48 +683,65 @@ bool Graph::topologicalSort()
 
 //MSTset --> {(base_node_index,edge_directed_to_index),weight}
 
- void Graph::MSTprims()
- {
-    vector<pair<pair<int,int>,int>> MSTset;
-    set<int> visited;
-    //min heap to extract min weight edge
-    priority_queue<pair<pair<int,int>,int>,vector<pair<pair<int,int>,int>>,myComparator> minHeap;
-    //starting from 0
-    visited.insert(0);
-    list<ListData>::iterator it;
-    for(it = this->Nodes[0].adjList.begin(); it != this->Nodes[0].adjList.end(); it++)
+void Graph::MSTprims()
+{
+   vector<pair<pair<int,int>,int>> MSTset;
+   set<int> visited;
+   //min heap to extract min weight edge
+   priority_queue<pair<pair<int,int>,int>,vector<pair<pair<int,int>,int>>,myComparator> minHeap;
+   //starting from 0
+   visited.insert(0);
+   list<ListData>::iterator it;
+   for(it = this->Nodes[0].adjList.begin(); it != this->Nodes[0].adjList.end(); it++)
+   {
+       minHeap.push(make_pair(make_pair(0,it->index),it->weight));
+   }
+   while(MSTset.size() < (this->Nodes.size() - 1))
+   {
+       pair<pair<int,int>,int> top = minHeap.top();
+       if(visited.find(top.first.second) == visited.end())
+       {
+           visited.insert(top.first.second);
+           MSTset.push_back(make_pair(make_pair(top.first.first,top.first.second),top.second));
+           minHeap.pop();
+           for(it = (this->Nodes.begin() + top.first.second)->adjList.begin(); it != (this->Nodes.begin() + top.first.second)->adjList.end(); it++)
+           {
+               minHeap.push(make_pair(make_pair((this->Nodes.begin() + top.first.second)->index,it->index),it->weight));
+           }
+       }
+       else
+       {
+           minHeap.pop();
+       }
+   }
+   //cout << "The MST is --> " << endl;
+   cout  << "The Most Close People Over The Network  --> " << endl;
+   vector<pair<pair<int,int>,int>>::iterator i;
+   for(i = MSTset.begin();i != MSTset.end(); i++)
+   {
+       //cout << "(" << i->first.first << " , " << i->first.second << ") ";
+       cout << "-------------------------------------------------------------" << endl;
+       cout << this->Nodes[i->first.first].fname << " " << this->Nodes[i->first.first].lname << " <-----> " << this->Nodes[i->first.second].fname << " " << this->Nodes[i->first.second].lname << endl;
+       cout << "-------------------------------------------------------------" << endl;
+   }
+}
+
+
+void Graph::shortestPathToKnowEveryOne()
+{
+    string tempId;
+    cout << "Enter Your ID" << endl;
+    cin >> tempId;
+    int indexfind = dfsSearchWrapID(tempId);
+    if(indexfind != -1)
     {
-        minHeap.push(make_pair(make_pair(0,it->index),it->weight));
+        this->shortestPathFixedNode(indexfind);
     }
-
-    while(MSTset.size() < (this->Nodes.size() - 1))
+    else
     {
-        pair<pair<int,int>,int> top = minHeap.top();
-        if(visited.find(top.first.second) == visited.end())
-        {
-            visited.insert(top.first.second);
-            MSTset.push_back(make_pair(make_pair(top.first.first,top.first.second),top.second));
-            minHeap.pop();
-            for(it = (this->Nodes.begin() + top.first.second)->adjList.begin(); it != (this->Nodes.begin() + top.first.second)->adjList.end(); it++)
-            {
-                minHeap.push(make_pair(make_pair((this->Nodes.begin() + top.first.second)->index,it->index),it->weight));
-            }
-        }
-        else
-        {
-            minHeap.pop();
-        }
+        cout << "Invelid ID" << endl;
     }
-
-    cout << "The MST is --> " << endl;
-
-    vector<pair<pair<int,int>,int>>::iterator i;
-    for(i = MSTset.begin();i != MSTset.end(); i++)
-    {
-        cout << "(" << i->first.first << " , " << i->first.second << ") ";
-    }
-
- }
+}
 
 bool Graph::shortestPathFixedNode(int Giveindex)
 {
@@ -737,13 +776,13 @@ bool Graph::shortestPathFixedNode(int Giveindex)
         distance[it->index] = it->weight;
     }
 
-    for(int i = 0; i < this->Nodes.size(); i++)
+    for(int i = 0; i < this->Nodes.size() - 2; i++)
     {
         int min = INT_MAX;
         int min_ind = 0;
         for(int j = 0; j < this->Nodes.size(); j++)
         {
-            if(distance[j] < min && found[j] == 0)
+            if(found[j] == 0 && distance[j] < min)
             {
                 min = distance[j];
                 min_ind = j;
@@ -762,29 +801,44 @@ bool Graph::shortestPathFixedNode(int Giveindex)
         }
     }
 
+    /*
     for(int i = 0; i < this->Nodes.size(); i++)
     {
         cout<<distance[i]<<" ";
     }
     cout << endl;
-    // for(int i = 0; i < this->Nodes.size(); i++)
-    // {
-    //     cout<<prev[i]<<" ";
-    // }
-    // cout << "\n" <<Giveindex<<endl;
-    // cout << "Paths --> "<< endl;
-    // for(int i = 0; i < this->Nodes.size(); i++)
-    // {
-    //     int j = this->Nodes[i].index;
-    //     cout<<prev[j] <<"<-";
-    //     //cout<<Giveindex<<" ";
-    //     while(prev[j] != Giveindex);
-    //     {
-    //         cout << prev[j] << "<-";  
-    //         j = this->Nodes[prev[j]].index;
-    //     }
-    //     cout <<endl;
-    // }
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        cout<<prev[i]<<" ";
+    }
+    
+
+    cout << "\n" <<Giveindex<<endl;
+    */
+    cout << "Paths --> "<< endl;
+    int j;
+    for(int i = 0; i < this->Nodes.size(); i++)
+    {
+        j = i;
+        cout << this->Nodes[j].fname << " " << this->Nodes[j].lname << endl;
+        cout << this->Nodes[j].idNum << endl;
+
+        cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" <<endl;
+
+        cout << this->Nodes[prev[j]].fname<< " " << this->Nodes[prev[j]].lname << endl;
+        cout << this->Nodes[prev[j]].idNum << endl;
+        while(prev[j] != Giveindex)
+        {
+            j = prev[j];
+            //cout << "<-" << prev[j];   
+            cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" <<endl;
+            cout << this->Nodes[prev[j]].fname<< " " << this->Nodes[prev[j]].lname << endl;
+            cout << this->Nodes[prev[j]].idNum << endl;
+        }
+        cout << "------------------------------------------" << endl;
+        cout << endl;
+    }
+    return true;
 }
 
 void Graph::AllPairShortestPath()
@@ -1329,7 +1383,7 @@ void Graph::showCompleteNetwork()
     string id1;
     int index1 = -1;
     cout << "Enter the Person IDNUM to GET Network for --> " << endl;
-    while(index1 != -1)
+    while(index1 == -1)
     {
         cout << "Enter a valid ID - " << endl;
         cin >> id1;
@@ -1608,36 +1662,52 @@ int main()
     g.addNodeWrap();
     g.addNodeWrap();
     g.addNodeWrap();
+    g.addNodeWrap();
     cout << g.Nodes[0].fname << endl;
     cout << g.Nodes[1].fname << endl;
     cout << g.Nodes[2].fname << endl;
     cout << g.Nodes[3].fname << endl;
+    cout << g.Nodes[4].fname << endl;
     g.Nodes[0].getConnected();
     for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
     {
         cout << it->index << " ";
     }
     cout << endl;
+    // g.Nodes[0].getConnected();
+    // for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
+    // {
+    //     cout << it->index << " ";
+    // }
+    // cout << endl;
+    g.Nodes[1].getConnected();
+    for(it = g.Nodes[1].adjList.begin(); it != g.Nodes[1].adjList.end(); it++)
+    {
+        cout << it->index << " ";
+    }
+    cout << endl;
+    g.Nodes[3].getConnected();
+    for(it = g.Nodes[3].adjList.begin(); it != g.Nodes[3].adjList.end(); it++)
+    {
+        cout << it->index << " ";
+    }
+    cout << endl;
+    g.deleteNodeByKeyWrap();
     g.Nodes[0].getConnected();
     for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
     {
         cout << it->index << " ";
     }
     cout << endl;
-    g.Nodes[2].getConnected();
-    for(it = g.Nodes[2].adjList.begin(); it != g.Nodes[2].adjList.end(); it++)
-    {
-        cout << it->index << " ";
-    }
-    cout << endl;
-    g.Nodes[2].getConnected();
-    for(it = g.Nodes[2].adjList.begin(); it != g.Nodes[2].adjList.end(); it++)
-    {
-        cout << it->index << " ";
-    }
-    cout << endl;
+
     g.checkConnectionWrap();
     g.Nodes[0].findEducationMates();
+    g.showCompleteNetwork();
+    g.MaximumDegreeOfSeparation();
+    g.listPotentialGroupsOnHobbies();
+    g.Nodes[0].listLatestConnectionsForMyNetwork();
+    g.shortestPathToKnowEveryOne();
+    g.MSTprims();
 
     //cout << g.Nodes[0].Gref->Nodes[0].fname;
 

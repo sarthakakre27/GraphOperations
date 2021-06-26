@@ -48,6 +48,8 @@ public:
     void addData(string givekey);
     bool getConnected();
 
+    void shortestPathToKnowSomeone();
+
     void listLatestConnectionsForMyNetwork();
 
     void findEducationMates();
@@ -70,6 +72,7 @@ public:
     bool addNode(string Givekey);
     //bool deleteNodeByKey(int Givekey);//depriciated
 
+    void deleteNodeByKeyWrap();
     bool deleteNodeByKey(string Givekey);
 
     bool deleteNodeByIndex(int index);
@@ -88,6 +91,7 @@ public:
 
     void MSTprims();
 
+    void shortestPathToKnowEveryOne();
     bool shortestPathFixedNode(int Giveindex);
 
     void AllPairShortestPath();
