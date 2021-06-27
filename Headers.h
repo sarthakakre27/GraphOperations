@@ -37,15 +37,21 @@ public:
     list<string> hobbies;
 
     Data(string Givekey, Graph* GiveGref);
-    //Data(string Givekey,int Givedata,Graph* GiveGref);
     ~Data();
-    //bool addEdgeByKey(int key,int Giveweight, Graph &g);//depriciated
+
+    void showdata();
+
+    void updateData();
+
     bool addEdgeByIDNum(string key,int Giveweight);
 
     bool addEdgeByIndex(int index,int Giveweight, Graph& g);
+
     bool deleteEdgeByKey(string Givekey);
     bool deleteEdgeByIndex(int index);
+
     void addData(string givekey);
+
     bool getConnected();
 
     void showNetwork();
@@ -62,7 +68,7 @@ public:
 
 class Graph
 {
-//private:
+
 public:
     vector<Data> Nodes;
 
@@ -72,21 +78,19 @@ public:
     void addNodeWrap();
 
     bool addNode(string Givekey);
-    //bool deleteNodeByKey(int Givekey);//depriciated
 
     void deleteNodeByKeyWrap();
     bool deleteNodeByKey(string Givekey);
 
     bool deleteNodeByIndex(int index);
-    //change
+
     void addEdge(string selfkey,string tokey);
-    //
+
     void breadthFirstTraversal(int index);
 
     void dfsTraversalWrap();
     void dfsTraversal(int index,int* dfsvisited);
 
-    //void dfsTraversalForAddEdgeWrap();
     void dfsTraversalForAddEdge(int index,int* dfsvisited);
 
     bool topologicalSort();
@@ -101,10 +105,9 @@ public:
     void dfsSearchWrap(string Givekey);
     void dfsSearch(string Givekey,int index,int* dfsvisited);
 
-    //change
+    
     int dfsSearchWrapID(string givekey);
     int dfsSearchID(string Givekey,int index,int* dfsvisited);
-    //
 
     void breadthFirstSearch(int index,string Givekey);
 

@@ -101,6 +101,16 @@ bool Data::deleteEdgeByKey(string Givekey)
     }
     if(it != this->adjList.end())//erase if valid listnode found
     {
+        list<ListData>::iterator ptr,found;
+        for(ptr = this->Gref->Nodes[it->index].adjList.begin(); ptr != this->Gref->Nodes[it->index].adjList.end(); ptr++)
+        {
+            if(ptr->idNum == this->idNum)
+            {
+                found = ptr;
+                break;
+            }
+        }
+        this->Gref->Nodes[it->index].adjList.erase(found);
         this->adjList.erase(it);
         return true;
     }
@@ -175,6 +185,207 @@ void Data::addData(string Givekey)
         cin >> hobbyflag;
     }
 
+}
+
+
+void Data::showdata()
+{
+    cout << "---------------------------------------------------------------------" << endl;
+    cout << "First Name - " << this->fname << " " << "Last Name - " << this->lname << endl;
+    cout << "IdNum - " << this->idNum << endl;
+    cout << "Educational Data - " << endl;
+    list<educatinalInstitute>::iterator it;
+    for(it = this->EducationList.begin(); it != this->EducationList.end(); it++)
+    {
+        cout << "---------------------------------------------------------------------" << endl;
+        cout << "Institute - " << it->InstituteName << endl;
+        cout << "Start Date - " << it->startDate.day << "/" << it->startDate.month << "/" << it->startDate.year << endl;
+        cout << "End Date - " << it->endDate.day << "/" << it->endDate.month << "/" << it->endDate.year << endl;
+        cout << "---------------------------------------------------------------------" << endl;
+    }
+    cout << "Hobbies - " << endl;
+    list<string>::iterator jt;
+    for(jt = this->hobbies.begin(); jt != hobbies.end(); jt++)
+    {
+        cout << "---------------------------------------------------------------------" << endl;
+        cout << *jt << endl;
+        cout << "---------------------------------------------------------------------" << endl;
+    }
+}
+
+void Data::updateData()
+{
+    int option = -1;
+    string EdInstitute;
+    date temp1,temp2;
+    string tempHobby;
+    cout << "---------------------------UPDATE DATA-------------------------------" << endl;
+    cout << "--------------------Displaying current Data--------------------------" << endl;
+    this->showdata();
+    cout << "=========Press the Number corresponding to the Options To Update=====" << endl;
+    cout << "==================1 - First Name | 2 - Last Name=====================" << endl;
+    cout << "===============3 - Add Institute | 4 - update Institue===============" <<endl;
+    cout << "===================5 - Add hobby | 6 - update hobby==================" << endl;
+    cout << "============7 - Delete Institute | 8 - Delete Hobby==================" << endl;
+    cin >> option;
+    switch (option)
+    {
+    case 1:
+        {
+            cout << "Enter First Name - " << endl;
+            cin >> this->fname;
+            cout << "-----------------------------UPDATED---------------------------------" << endl;
+        }
+        break;
+    case 2:
+        {
+            cout << "Enter Last Name - " << endl;
+            cin >> this->lname;
+            cout << "-----------------------------UPDATED---------------------------------" << endl;
+        }
+        break;
+    case 3:
+        {
+            cout << "Enter Name Of the Institution - " << endl;
+            cin.ignore();
+            getline(cin,EdInstitute);
+            cout << "Enter Start Date - " << endl;
+            temp1.setDate();
+            cout << "Enter End Date - " << endl;
+            cout << "If currently Studying Enter Expected Completion Date - " << endl;
+            while(!temp2.checkGreater(temp1))
+            {
+                cout << "Enter a Later date than the start date" << endl;
+                temp2.setDate();
+            }
+            this->EducationList.push_back(educatinalInstitute(EdInstitute,temp1,temp2));
+            cout << "------------------------------ADDED----------------------------------" << endl;
+        }
+        break;
+    case 4:
+        {
+            cout << "Enter Institute Name - " << endl;
+            cin.ignore();
+            getline(cin,EdInstitute);
+            list<educatinalInstitute>::iterator it,found;
+            for(it = this->EducationList.begin(); it != this->EducationList.end(); it++)
+            {
+                if(it->InstituteName == EdInstitute)
+                {
+                    found = it;
+                    break;
+                }
+            }
+            if(it != this->EducationList.end())
+            {
+                cout << "Enter Name Of the Institution - " << endl;
+                cin.ignore();
+                getline(cin,EdInstitute);
+                cout << "Enter Start Date - " << endl;
+                temp1.setDate();
+                cout << "Enter End Date - " << endl;
+                cout << "If currently Studying Enter Expected Completion Date - " << endl;
+                while(!temp2.checkGreater(temp1))
+                {
+                    cout << "Enter a Later date than the start date" << endl;
+                    temp2.setDate();
+                }
+                found->InstituteName = EdInstitute;
+                found->startDate = temp1;
+                found->endDate = temp2;
+                cout << "-----------------------------UPDATED---------------------------------" << endl;
+            }
+            else
+            {
+                cout << "Input Invalid" << endl;
+            }
+        }
+        break;
+    case 5:
+        {
+            cout << "Enter Hobby To Add - " << endl;
+            cin >> tempHobby;
+            this->hobbies.push_back(tempHobby);
+            cout << "------------------------------ADDED----------------------------------" << endl;
+        }
+        break;
+    case 6:
+        {
+            cout << "Enter Hobby Name in the current hobbies To Update - " << endl;
+            cin >> tempHobby;
+            list<string>::iterator it,found;
+            for(it = this->hobbies.begin(); it != this->hobbies.end(); it++)
+            {
+                if(tempHobby == *it)
+                {
+                    found = it;
+                    break;
+                }
+            }
+            if(it != this->hobbies.end())
+            {
+                cout << "Enter The Updated Hobby - " << endl;
+                cin >> *found;
+                cout << "-----------------------------UPDATED---------------------------------" << endl;
+            }
+            else
+            {
+                cout << "Invalid Input" << endl;
+            }
+        }
+        break;
+    case 7:
+        {
+            cout << "Enter Institute Name To Delete - " << endl;
+            cin >> EdInstitute;
+            list<educatinalInstitute>::iterator it,found;
+            for(it = this->EducationList.begin(); it != this->EducationList.end(); it++)
+            {
+                if(EdInstitute == it->InstituteName)
+                {
+                    found = it;
+                    break;
+                }
+            }
+            if(it != this->EducationList.end())
+            {  
+                this->EducationList.erase(found);
+                cout << "-----------------------------DELETED---------------------------------" << endl;
+            }
+            else
+            {
+                cout << "Invalid Input" << endl;
+            }
+        }
+        break;
+    case 8:
+        {
+            cout << "Enter Hobby Name To Delete - " << endl;
+            cin >> tempHobby;
+            list<string>::iterator it,found;
+            for(it = this->hobbies.begin(); it != this->hobbies.end(); it++)
+            {
+                if(tempHobby == *it)
+                {
+                    found = it;
+                    break;
+                }
+            }
+            if(it != this->hobbies.end())
+            {
+                this->hobbies.erase(found);
+                cout << "-----------------------------DELETED---------------------------------" << endl;
+            }
+            else
+            {
+                cout << "Invalid Input" << endl;
+            }
+        }
+        break;
+    
+    default:
+        break;
+    }
 }
 
 
@@ -1462,6 +1673,7 @@ int main()
     int choice = 0;
     int graphChoice = -1;
     string idTemp;
+    string tempIDforRemove;
     cout << "=======================================================================================================================" << endl;
     cout << "=========================================== WELCOME TO MY VERSION OF LINKEDIN =========================================" << endl;
     cout << "=======================================================================================================================" << endl;
@@ -1474,7 +1686,7 @@ int main()
         cout << "============ 5 - Most Close Connections On The Network | 6 - To Know All Ways To Reach From Person 1 To Person 2 ======" << endl;
         cout << "==== 7 - Show Complete Network For A perticular Person | 8 - Maximum Degree Of Separation On The Network ==============" << endl;
         cout << "==================9 - List Potential groups On Hobbies | 10 - Delete Account ==========================================" << endl;
-        cout << "==================================================== 11 - Quit ========================================================" << endl;
+        cout << "=================================================== 11 - Quit =========================================================" << endl;
 
         cin >> graphChoice;
 
@@ -1514,7 +1726,8 @@ int main()
                     cout << "================================Enter The Number corresponding To Following Options==========================" << endl;
                     cout << "========================= 1 - To Get Connected To SomeOne | 2 - To View Your Connections ====================" << endl;
                     cout << "==== 3 - View Shortest Way To Get In Contact With SomeOne | 4 - View Latest Connections For Your Network ====" << endl;
-                    cout << "================================ 5 - Find Education Mates | 6 - Logout=======================================" << endl;
+                    cout << "================================ 5 - Find Education Mates | 6 - Update Data =================================" << endl;
+                    cout << "==================================== 7 - RemoveConnection | 8 - Logout ======================================" << endl;
                     cin >> fineChoice;
                     if(fineChoice == 1)
                     {
@@ -1537,6 +1750,32 @@ int main()
                         G.Nodes[index1Main].findEducationMates();
                     }
                     else if(fineChoice == 6)
+                    {
+                        G.Nodes[index1Main].updateData();
+                    }
+                    else if(fineChoice == 7)
+                    {
+                        cout << "Enter IdNum to remove Connection for - " << endl;
+                        cin >> tempIDforRemove;
+                        list<ListData>::iterator rmptr;
+                        for(rmptr = G.Nodes[index1Main].adjList.begin(); rmptr != G.Nodes[index1Main].adjList.end(); rmptr++)
+                        {
+                            if(rmptr->idNum == tempIDforRemove)
+                            {
+                                break;
+                            }
+                        }
+                        if(rmptr != G.Nodes[index1Main].adjList.end())
+                        {
+                            G.Nodes[index1Main].deleteEdgeByKey(rmptr->idNum);
+                        }
+                        else
+                        {
+                            cout << "Invalid IDNum" << endl;
+                        }
+                        
+                    }
+                    else if(fineChoice == 8)
                     {
                         continueTerm = 0;
                     }
