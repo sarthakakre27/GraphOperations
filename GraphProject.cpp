@@ -16,56 +16,13 @@ Data::Data(string Givekey, Graph* GiveGref)
 
 }
 
-/*
-Data::Data(string Givekey,int Givedata, Graph* GiveGref)  //
-    :Gref(GiveGref),data(Givedata),idNum(Givekey)//,key(Givekey)
-{
-    
-}
-*/
 
 Data::~Data()
 {
     this->adjList.clear();
 }
 
-/*
-bool Data::addEdgeByKey(int Givekey, int Giveweight, Graph &g)
-{
-    if (this->key == Givekey) //avoiding self loops
-        return false;
-    vector<Data>::iterator i, d1;
-    //searching for the key
-    for (i = g.Nodes.begin(); i != g.Nodes.end(); i++)
-    {
-        if (i->key == Givekey)
-        {
-            d1 = i;
-            break;
-        }
-    }
-    if (d1 == g.Nodes.end())//key not found
-    {
-        cout << "Key Not Found" << endl;
-        return false;
-    }
 
-    //else found -- check for existing edge
-    list<ListData>::iterator it;
-    for(it = g.Nodes[this->index].adjList.begin();it != g.Nodes[this->index].adjList.end(); it++)
-    {
-        if(it->index == d1->index)
-        {
-            cout << "Already edge existing" << endl;
-            return false;//already exists
-        }
-    }
-
-    //else add an edge
-    this->adjList.push_back(ListData(Givekey, Giveweight, d1->index,this->idNum));//found and pushed
-    return true;
-}
-*/
 
 bool Data::addEdgeByIDNum(string GiveIDNum, int Giveweight)
 {
@@ -181,8 +138,6 @@ void Data::addData(string Givekey)
     cin >> this->fname;
     cout << "Enter Your Last Name - " << endl;
     cin >> this->lname;
-    // cout << "Enter Your ID Number / Identification Serial Code - " << endl;
-    // cin >> this->idNum;
     this->idNum = Givekey;
     cout << "Enter the Educational Details - " << endl;
     cout << "Press 1 to Stop" << endl;
@@ -222,7 +177,6 @@ void Data::addData(string Givekey)
 
 }
 
-//--------------------------------------------------- test --------------------------------------------------------------
 
 bool Data::getConnected()
 {
@@ -329,6 +283,25 @@ void Data::shortestPathToKnowSomeone()
     this->Gref->shortestPathFixedNode(this->index);
 }
 
+
+void Data::showNetwork()
+{
+    string id1;
+    int index1 = this->index;
+    
+
+    cout << "The complete NETWORK CONNECTIONS for the your IDNUM are -->" << endl;
+
+    list<ListData>::iterator it;
+    for(it = this->Gref->Nodes[index1].adjList.begin(); it != this->Gref->Nodes[index1].adjList.end(); it++)
+    {
+        cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - " << endl;
+        cout << this->Gref->Nodes[it->index].fname << " " << this->Gref->Nodes[it->index].lname << endl;
+        cout << "IDNUM - " << this->Gref->Nodes[it->index].idNum << endl;
+        cout << "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - " << endl;
+    }
+}
+
 /*----------------------------------------GRAPH CLASS MEMBERS METHODS-----------------------------------------------------*/
 
 Graph::Graph()
@@ -386,55 +359,6 @@ bool Graph::addNode(string Givekey)
     this->Nodes[this->Nodes.size() - 1].addData(Givekey);
     return true;
 }
-
-/*
-bool Graph::deleteNodeByKey(int Givekey)
-{
-    int found = 0;
-    vector<Data>::iterator i;
-    for (i = this->Nodes.begin(); i != this->Nodes.end(); i++)
-    {
-        if (i->key == Givekey)
-        {
-            break;
-        }
-    
-    }
-    if (i != this->Nodes.end())//found index in the node vector
-    {
-        int Foundindex = i->index;
-        vector<Data>::iterator vecIt;
-        for(vecIt = this->Nodes.begin(); vecIt != this->Nodes.end(); vecIt++)
-        {
-            list<ListData>::iterator lIt,eraseptr;
-            found = 0;
-            for(lIt = vecIt->adjList.begin(); lIt != vecIt->adjList.end(); lIt++)
-            {
-                if(lIt->index > Foundindex)
-                {
-                    lIt->index--;
-                }
-                else if(lIt->index == Foundindex)
-                {
-                    eraseptr = lIt;
-                    found = 1;
-                    //erase the incoming pointers to the node to be deleted
-                }
-            }
-            if(found == 1)
-                vecIt->adjList.erase(eraseptr);
-        }
-        //after erasing the the incoming pointers erase the node
-        this->Nodes.erase(i);
-        for (int i = Foundindex; i < this->Nodes.size(); i++)
-        {
-            this->Nodes[i].index = i;
-        }
-        return true;
-    }
-    return false;//key not found
-}
-*/
 
 
 void Graph::deleteNodeByKeyWrap()
@@ -599,13 +523,17 @@ void Graph::dfsTraversalWrap()
 
 }
 
-void Graph::dfsTraversal(int index,int* dfsvisited)
+void Graph::dfsTraversal(int Giveindex,int* dfsvisited)
 {
-    dfsvisited[index] = true;
-    cout << "visiting node no." << index <<" ";
+    dfsvisited[Giveindex] = true;
+    //cout << "visiting node no." << index <<" ";
+    cout <<"-------------------------------------------------" << endl;
+    cout << this->Nodes[Giveindex].fname << " " << this->Nodes[Giveindex].lname << endl;
+    cout << "IDNUMBER - " << this->Nodes[Giveindex].idNum << endl;
+    cout << "------------------------------------------------" << endl;
 
     list<ListData>::iterator it;
-    for(it = this->Nodes[index].adjList.begin(); it != this->Nodes[index].adjList.end(); it++)
+    for(it = this->Nodes[Giveindex].adjList.begin(); it != this->Nodes[Giveindex].adjList.end(); it++)
     {
         if( !dfsvisited[it->index])
         {
@@ -614,7 +542,6 @@ void Graph::dfsTraversal(int index,int* dfsvisited)
     }
 }
 
-//------------------------------------------ testing ----------------------------------------------------
 
 void Graph::dfsTraversalForAddEdge(int Giveindex,int* dfsvisited)
 {
@@ -739,7 +666,7 @@ void Graph::shortestPathToKnowEveryOne()
     }
     else
     {
-        cout << "Invelid ID" << endl;
+        cout << "Invalid ID" << endl;
     }
 }
 
@@ -801,20 +728,6 @@ bool Graph::shortestPathFixedNode(int Giveindex)
         }
     }
 
-    /*
-    for(int i = 0; i < this->Nodes.size(); i++)
-    {
-        cout<<distance[i]<<" ";
-    }
-    cout << endl;
-    for(int i = 0; i < this->Nodes.size(); i++)
-    {
-        cout<<prev[i]<<" ";
-    }
-    
-
-    cout << "\n" <<Giveindex<<endl;
-    */
     cout << "Paths --> "<< endl;
     int j;
     for(int i = 0; i < this->Nodes.size(); i++)
@@ -846,16 +759,6 @@ void Graph::AllPairShortestPath()
     int count = 0;
 
     vector<vector<int>> Dist(this->Nodes.size(),vector<int> (this->Nodes.size(),INT_MAX));
-
-    // for(int i = 0; i < this->Nodes.size(); i++)
-    // {
-    //     for(int j = 0; j < this->Nodes.size(); j++)
-    //     {
-    //         cout << Dist[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << "hi" <<endl;
 
     vector<vector<int>> Next(this->Nodes.size(),vector<int>(this->Nodes.size(),-1));
 
@@ -1165,6 +1068,32 @@ bool Graph::isCyclicUtil(int index,bool* visited,bool* recStack)
     }
 }
 
+void Graph::allPathsBetweenPairOfNodesWrap()
+{
+    string tempid1,tempid2;
+    cout << "Enter IdNumber Of Person 1" << endl;
+    cin >> tempid1;
+    int index1 = dfsSearchWrapID(tempid1);
+    if(index1 == -1)
+    {
+        cout << "Invalid IdNumber" << endl;
+        cout << "Sorry Not Found On Network" << endl;
+        return;
+    }
+    cout << "Enter IdNumber Of Person 2" << endl;
+    cin >> tempid2;
+    int index2 = dfsSearchWrapID(tempid2);
+    if(index2 == -1)
+    {
+        cout << "Invalid IdNumber" << endl;
+        cout << "Sorry Not Found On Network" << endl;
+        return; 
+    }
+
+    this->allPathsBetweenPairOfNodes(index1,index2);
+
+}
+
 void Graph::allPathsBetweenPairOfNodes(int index1, int index2)
 {
     if((index1 < 0 || index1 > this->Nodes.size()) || (index2 < 0 || index2 > this->Nodes.size()))
@@ -1315,7 +1244,6 @@ void Graph::findEducationMates(int Giveindex)
     }
 }
 
-//------------------------------------------------------ test ---------------------------------------------------------------------------
 
 void Graph::checkConnectionWrap()
 {
@@ -1376,7 +1304,6 @@ void Graph::checkConnectionWrap()
 
 }
 
-//-------------------------------------------------------- test ------------------------------------------------------------
 
 void Graph::showCompleteNetwork()
 {
@@ -1531,186 +1458,135 @@ educatinalInstitute::educatinalInstitute(string giveInstituteName, date givestar
 
 int main()
 {
+    Graph G;
+    int choice = 0;
+    int graphChoice = -1;
+    string idTemp;
+    cout << "=======================================================================================================================" << endl;
+    cout << "=========================================== WELCOME TO MY VERSION OF LINKEDIN =========================================" << endl;
+    cout << "=======================================================================================================================" << endl;
 
-    // Graph g;
-    // g.addNode(0);
-    // g.addNode(1);
-    // g.addNode(2);
-    // g.addNode(3);
-    // g.addNode(4);
-    // g.addNode(5);
-    // g.addNode(6);
-    // g.addNode(7);
-    // g.Nodes[0].addEdgeByIndex(1,10,g);
-    // g.Nodes[1].addEdgeByIndex(3,10,g);
-    // g.Nodes[1].addEdgeByIndex(4,10,g);
-    // g.Nodes[4].addEdgeByIndex(7,10,g);
-    // g.Nodes[3].addEdgeByIndex(7,10,g);
-    // g.Nodes[7].addEdgeByIndex(5,10,g);
-    // g.Nodes[7].addEdgeByIndex(6,10,g);
-    // g.Nodes[5].addEdgeByIndex(2,10,g);
-    // g.Nodes[6].addEdgeByIndex(2,10,g);
-    // g.Nodes[2].addEdgeByIndex(0,10,g);
-
-    // cout << endl;
-    // g.Nodes[2].deleteEdgeByIndex(0);
-    // g.topologicalSort();
-    // cout << endl;
-
-    // g.deleteNodeByIndex(5);
-    // vector<Data>::iterator it = g.Nodes.begin();
-    // list<ListData>::iterator j;
-    // for(it = g.Nodes.begin();it != g.Nodes.end(); it++)
-    // {
-    //     cout<<it->index<<" ";
-    //     for(j = g.Nodes[it->index].adjList.begin(); j!=g.Nodes[it->index].adjList.end();j++)
-    //     {
-    //         cout<<j->index<<"-";
-    //     }
-    //     cout<<endl;
-
-    // }
-    // g.deleteNodeByKey(4);
-    // for(it = g.Nodes.begin();it != g.Nodes.end(); it++)
-    // {
-    //     cout<<it->index<<" ";
-    //     for(j = g.Nodes[it->index].adjList.begin(); j!=g.Nodes[it->index].adjList.end();j++)
-    //     {
-    //         cout<<j->index<<"-";
-    //     }
-    //     cout<<endl;
-
-    // }
-    
-    // g.dfsTraversalWrap();
-    // cout<<endl;
-    // g.breadthFirstTraversal(0);
-
-    // cout<<"\n\n";
-    // Graph g1;
-    // g1.addNode(0);
-    // g1.addNode(1);
-    // g1.addNode(2);
-    // g1.addNode(3);
-    // g1.Nodes[0].addEdgeByIndex(1,3,g1);
-    // g1.Nodes[1].addEdgeByIndex(0,3,g1);
-    // g1.Nodes[0].addEdgeByIndex(2,3,g1);
-    // g1.Nodes[2].addEdgeByIndex(0,3,g1);
-    // g1.Nodes[1].addEdgeByIndex(2,2,g1);
-    // g1.Nodes[2].addEdgeByIndex(1,2,g1);
-    // g1.Nodes[2].addEdgeByIndex(3,2,g1);
-    // g1.Nodes[3].addEdgeByIndex(2,2,g1);
-    // g1.Nodes[3].addEdgeByIndex(1,3,g1);
-    // g1.Nodes[1].addEdgeByIndex(3,3,g1);
-    // g1.MSTprims();
-
-    // Graph g2;
-    // g2.addNode(0);
-    // g2.addNode(1);
-    // g2.addNode(2);
-    // g2.addNode(3);
-    // g2.addNode(4);
-
-    // g2.Nodes[0].addEdgeByIndex(1,2,g2);
-    // g2.Nodes[0].addEdgeByIndex(2,5,g2);
-    // g2.Nodes[0].addEdgeByIndex(4,3,g2);
-
-    // g2.Nodes[1].addEdgeByIndex(2,6,g2);
-    // g2.Nodes[1].addEdgeByIndex(4,10,g2);
-    // g2.Nodes[1].addEdgeByIndex(3,4,g2);
-
-    // g2.Nodes[2].addEdgeByIndex(4,2,g2);
-    // g2.Nodes[2].addEdgeByIndex(3,6,g2);
-
-    // g2.Nodes[4].addEdgeByIndex(2,1,g2);
-    // g2.Nodes[4].addEdgeByIndex(3,2,g2);
-
-    // g2.shortestPathFixedNode(0);
-    //g2.AllPairShortestPath();
-    //cout<<INT_MAX;
-    // cout << g2.isCyclic();
-
-    // Graph g1;
-    // g1.addNode(0,200);
-    // g1.addNode(1,400);
-    // g1.addNode(2,600);
-    // g1.addNode(3,800);
-    // cout << g1.Nodes[0].data;
-    // g1.Nodes[2].addData();
-
-    // g1.Nodes[0].addEdgeByIndex(1,10,g1);
-    // g1.Nodes[0].addEdgeByIndex(2,5,g1);
-    // g1.Nodes[1].addEdgeByIndex(3,2,g1);
-    // g1.Nodes[2].addEdgeByIndex(3,1,g1);
-    // //g2.Nodes[0].addEdgeByIndex(3,4,g2);
-    // g1.addEdge(0,3);
-    // cout << g1.isCyclic();
-
-    // g1.breadthFirstSearch(0,800);
-    // g1.dfsSearchWrap(400);
-    // g1.allPathsBetweenPairOfNodes(0,3);
-    // cout << "hi";
-    // g1.deleteNodeByIndex(1);
-    // cout << g1.Nodes[1].fname << endl;
-    // list<educatinalInstitute>:: iterator k;
-    // k = g1.Nodes[1].EducationList.begin();
-    // cout << k->startDate.day << " " << k->startDate.year;
-
-    Graph g;
-    list<ListData>::iterator it;
-    g.addNodeWrap();
-    g.addNodeWrap();
-    g.addNodeWrap();
-    g.addNodeWrap();
-    g.addNodeWrap();
-    cout << g.Nodes[0].fname << endl;
-    cout << g.Nodes[1].fname << endl;
-    cout << g.Nodes[2].fname << endl;
-    cout << g.Nodes[3].fname << endl;
-    cout << g.Nodes[4].fname << endl;
-    g.Nodes[0].getConnected();
-    for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
+    while(choice == 0)
     {
-        cout << it->index << " ";
-    }
-    cout << endl;
-    // g.Nodes[0].getConnected();
-    // for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
-    // {
-    //     cout << it->index << " ";
-    // }
-    // cout << endl;
-    g.Nodes[1].getConnected();
-    for(it = g.Nodes[1].adjList.begin(); it != g.Nodes[1].adjList.end(); it++)
-    {
-        cout << it->index << " ";
-    }
-    cout << endl;
-    g.Nodes[3].getConnected();
-    for(it = g.Nodes[3].adjList.begin(); it != g.Nodes[3].adjList.end(); it++)
-    {
-        cout << it->index << " ";
-    }
-    cout << endl;
-    g.deleteNodeByKeyWrap();
-    g.Nodes[0].getConnected();
-    for(it = g.Nodes[0].adjList.begin(); it != g.Nodes[0].adjList.end(); it++)
-    {
-        cout << it->index << " ";
-    }
-    cout << endl;
+        cout << "============================Enter The Following Numbers For The Following Options======================================" << endl;
+        cout << "==================== 1 - Viewing people On The Network | 2 - Add An Account ===========================================" << endl;
+        cout << "==================== 3 - Shortest Path To Know Someone | 4 - Login To Your Account ====================================" << endl;
+        cout << "============ 5 - Most Close Connections On The Network | 6 - To Know All Ways To Reach From Person 1 To Person 2 ======" << endl;
+        cout << "==== 7 - Show Complete Network For A perticular Person | 8 - Maximum Degree Of Separation On The Network ==============" << endl;
+        cout << "==================9 - List Potential groups On Hobbies | 10 - Delete Account ==========================================" << endl;
+        cout << "==================================================== 11 - Quit ========================================================" << endl;
 
-    g.checkConnectionWrap();
-    g.Nodes[0].findEducationMates();
-    g.showCompleteNetwork();
-    g.MaximumDegreeOfSeparation();
-    g.listPotentialGroupsOnHobbies();
-    g.Nodes[0].listLatestConnectionsForMyNetwork();
-    g.shortestPathToKnowEveryOne();
-    g.MSTprims();
+        cin >> graphChoice;
 
-    //cout << g.Nodes[0].Gref->Nodes[0].fname;
+        switch (graphChoice)
+        {
+        case 1:
+            {
+                G.dfsTraversalWrap();
+            }
+            break;
 
+        case 2:
+            {
+                G.addNodeWrap();
+            }
+            break;
+        case 3:
+            {
+                G.shortestPathToKnowEveryOne();
+            }
+            break;
+        case 4:
+            {
+                cout << "Enter IdNumber Of Person 1" << endl;
+                cin >> idTemp;
+                int fineChoice = -1;
+                int index1Main = G.dfsSearchWrapID(idTemp);
+                if(index1Main == -1)
+                {
+                    cout << "Invalid IdNumber" << endl;
+                    cout << "Sorry Not Found On Network" << endl;
+                    break;
+                }
+                int continueTerm = 1;
+                while(continueTerm == 1)
+                {
+                    cout << "================================Enter The Number corresponding To Following Options==========================" << endl;
+                    cout << "========================= 1 - To Get Connected To SomeOne | 2 - To View Your Connections ====================" << endl;
+                    cout << "==== 3 - View Shortest Way To Get In Contact With SomeOne | 4 - View Latest Connections For Your Network ====" << endl;
+                    cout << "================================ 5 - Find Education Mates | 6 - Logout=======================================" << endl;
+                    cin >> fineChoice;
+                    if(fineChoice == 1)
+                    {
+                        G.Nodes[index1Main].getConnected();
+                    }
+                    else if(fineChoice == 2)
+                    {
+                        G.Nodes[index1Main].showNetwork();
+                    }
+                    else if(fineChoice == 3)
+                    {
+                        G.Nodes[index1Main].shortestPathToKnowSomeone();
+                    }
+                    else if(fineChoice == 4)
+                    {
+                        G.Nodes[index1Main].listLatestConnectionsForMyNetwork();
+                    }
+                    else if(fineChoice == 5)
+                    {
+                        G.Nodes[index1Main].findEducationMates();
+                    }
+                    else if(fineChoice == 6)
+                    {
+                        continueTerm = 0;
+                    }
+                    else
+                    {
+                        cout << "Invalid Choice" << endl;
+                    }
+                }
+            }
+            break;
+        case 5:
+            {
+                G.MSTprims();
+            }
+            break;
+        case 6:
+            {
+                G.allPathsBetweenPairOfNodesWrap();
+            }
+            break;
+        case 7:
+            {
+                G.showCompleteNetwork();
+            }
+            break;
+        case 8:
+            {
+                G.AllPairShortestPath();
+            }
+            break;
+        case 9:
+            {
+                G.listPotentialGroupsOnHobbies();
+            }
+            break;
+        case 10:
+            {
+                G.deleteNodeByKeyWrap(); 
+            }
+            break;
+        case 11:
+            {
+                cout << "Thank You" << endl;
+                choice = 1; 
+            }
+            break;
+        default:
+            break;
+        }
+    }
 
     return 0;
 }

@@ -48,6 +48,8 @@ public:
     void addData(string givekey);
     bool getConnected();
 
+    void showNetwork();
+
     void shortestPathToKnowSomeone();
 
     void listLatestConnectionsForMyNetwork();
@@ -112,6 +114,7 @@ public:
     bool isCyclicUtil(int index,bool* visited,bool* recStack);
 
 
+    void allPathsBetweenPairOfNodesWrap();
     void allPathsBetweenPairOfNodes(int index1, int index2);
     void allPathsBetweenPairOfNodesUtil(int index1, int index2,bool* visited,int* path,int& pathIndex);
 
