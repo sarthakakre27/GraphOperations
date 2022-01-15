@@ -11,7 +11,7 @@ ListData::ListData(string GiveIDNum,int Giveweight, int Giveindex)
 
 /*-----------------------------------------DATA CLASS MEMBER METHODS-----------------------------------------*/
 Data::Data(string Givekey, Graph* GiveGref)
-    :Gref(GiveGref),idNum(Givekey)//,key(Givekey)
+    :Gref(GiveGref),idNum(Givekey)
 {
 
 }
